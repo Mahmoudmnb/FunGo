@@ -1,4 +1,15 @@
+import 'dart:developer';
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:network_info/network_info.dart';
+import 'package:toast/toast.dart';
+
+import '../features/auth/models/user.dart';
+
 class Constants {
+  static User? user;
+
   static const String _domain = 'https://fungo.mustafafares.com';
 
   //* user end points
@@ -39,4 +50,32 @@ class Constants {
 
   //* activityTypes end points
   static const getAllActivityTypes = '$_domain/api/activity-type';
+}
+
+Future checkInternet(Future Function() fun, BuildContext? context) async {
+  context != null ? ToastContext().init(context) : null;
+  bool isMounted = context != null && context.mounted
+      ? true
+      : context == null
+          ? true
+          : false;
+  try {
+    bool isConnected = await NetworkInfo.instance.isConnected;
+    if (isMounted) {
+      if (isConnected) {
+        await fun();
+      } else if (context != null) {
+        Toast.show('تأكد من اتصالك بالانترنت', duration: Toast.lengthLong);
+      }
+    }
+  } on SocketException catch (_) {
+    if (context != null && context.mounted) {
+      Toast.show('تأكد من اتصالك بالانترنت', duration: Toast.lengthLong);
+    }
+  } catch (e) {
+    log(e.toString());
+    if (isMounted && context != null) {
+      Toast.show('خطأ غير معروف حاول ثانية', duration: Toast.lengthLong);
+    }
+  }
 }

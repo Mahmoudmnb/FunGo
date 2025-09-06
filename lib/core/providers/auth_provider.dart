@@ -1,11 +1,16 @@
 // lib/core/providers/auth_provider.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fun_go_app/injection.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 enum AuthStatus { loading, unauthenticated, authenticated }
 
 final authProvider = StateProvider<AuthStatus>((ref) {
-  // مؤقتاً خليها ترجع unauthenticated
-  // بعدين بتضيفي SharedPreferences/Firebase
+  SharedPreferences sh = sl.get<SharedPreferences>();
+  String? user = sh.getString('user');
+  if (user != null) {
+    return AuthStatus.authenticated;
+  }
   return AuthStatus.unauthenticated;
 });
 

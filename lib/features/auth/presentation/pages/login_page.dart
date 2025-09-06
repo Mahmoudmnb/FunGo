@@ -1,5 +1,12 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:fun_go_app/core/extensions.dart';
+import 'package:fun_go_app/features/auth/presentation/pages/register_page.dart';
+import 'package:fun_go_app/features/auth/presentation/widgets/login_button.dart';
+import 'package:fun_go_app/features/home/presentation/pages/home_page.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import '../../methods/auth_methods.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -11,6 +18,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isPasswordVisible = false;
   final bool _isLoading = false;
   late AnimationController _fadeController;
@@ -32,7 +40,26 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   @override
   void dispose() {
     _fadeController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
     super.dispose();
+  }
+
+  void _showDialog(
+    BuildContext context,
+    DialogType type,
+    String title,
+    String desc,
+  ) {
+    AwesomeDialog(
+      context: context,
+      dialogType: type,
+      animType: AnimType.scale,
+      title: title,
+      desc: desc,
+      btnOkOnPress: () {},
+      btnOkText: 'OK',
+    ).show();
   }
 
   @override
@@ -117,56 +144,64 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                         ),
                       ],
                     ),
-                    child: Column(
-                      children: [
-                        _buildTextField(
-                          controller: emailController,
-                          hint: 'البريد الالكتروني',
-                          icon: Icons.email_outlined,
-                          keyboardType: TextInputType.emailAddress,
-                        ),
-                        const SizedBox(height: 20),
-                        _buildTextField(
-                          controller: passwordController,
-                          hint: 'كلمة المرور',
-                          icon: Icons.lock_outline,
-                          isPassword: true,
-                        ),
-                        const SizedBox(height: 24),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.teal,
-                              foregroundColor: Colors.white,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                            ),
-                            onPressed: () {},
-                            child: _isLoading
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.white,
-                                      ),
-                                    ),
-                                  )
-                                : Text(
-                                    'تسجيل الدخول',
-                                    style: GoogleFonts.cairo(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          _buildTextField(
+                            validator: (p0) {
+                              if (!p0!.trim().isValidEmail()) {
+                                return 'إيميل غير صالح';
+                              }
+                              return null;
+                            },
+                            controller: emailController,
+                            hint: 'البريد الالكتروني',
+                            icon: Icons.email_outlined,
+                            keyboardType: TextInputType.emailAddress,
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 20),
+                          _buildTextField(
+                            controller: passwordController,
+                            hint: 'كلمة المرور',
+                            validator: (p0) {
+                              if (p0!.trim().length < 6) {
+                                return 'كلمة المرور يجب أن تكون اكثر من ستة محارف ';
+                              }
+                              return null;
+                            },
+                            icon: Icons.lock_outline,
+                            isPassword: true,
+                          ),
+                          const SizedBox(height: 24),
+                          LoginButton(
+                            onTap: () async {
+                              if (emailController.text.isEmpty ||
+                                  passwordController.text.isEmpty) {
+                                _showDialog(
+                                  context,
+                                  DialogType.warning,
+                                  'Warning',
+                                  'Please fill in all fields',
+                                );
+                              }
+                              if (_formKey.currentState!.validate()) {
+                                bool isSuccess = await login(
+                                    email: emailController.text.trim(),
+                                    password: passwordController.text.trim(),
+                                    context: context);
+                                if (isSuccess && context.mounted) {
+                                  Navigator.of(context)
+                                      .pushReplacement(MaterialPageRoute(
+                                    builder: (context) => const HomePage(),
+                                  ));
+                                }
+                              }
+                            },
+                            text: 'تسجيل الدخول',
+                          ),
+                        ],
+                      ),
                     ),
                   ),
 
@@ -184,7 +219,11 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                         ),
                       ),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const RegisterPage(),
+                          ));
+                        },
                         child: Text(
                           'إنشاء حساب',
                           style: GoogleFonts.cairo(
@@ -210,9 +249,11 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     required String hint,
     required IconData icon,
     bool isPassword = false,
+    String? Function(String?)? validator,
     TextInputType? keyboardType,
   }) {
-    return TextField(
+    return TextFormField(
+      validator: validator,
       controller: controller,
       obscureText: isPassword && !_isPasswordVisible,
       keyboardType: keyboardType,

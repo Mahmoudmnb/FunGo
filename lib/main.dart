@@ -1,12 +1,16 @@
 // lib/main.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fun_go_app/injection.dart';
 
 import 'core/providers/auth_provider.dart';
+import 'features/auth/presentation/pages/login_page.dart';
 import 'features/auth/presentation/pages/splash_page.dart';
 import 'features/home/presentation/pages/home_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await init();
   runApp(const ProviderScope(child: FungoApp()));
 }
 
@@ -28,7 +32,7 @@ class FungoApp extends ConsumerWidget {
       ),
       home: authState.when(
         loading: () => const SplashPage(), // ⏳ السبلاش
-        unauthenticated: () => const HomePage(), // 🔑 أول مرة
+        unauthenticated: () => const LoginPage(), // 🔑 أول مرة
         authenticated: () => const HomePage(), // 🏠 مسجل مسبقاً
       ),
     );
