@@ -74,8 +74,12 @@ Future<List<SalesPlacesModel>?> getSales(
       );
     }
     if (res.statusCode == 200) {
-      final decoded = jsonDecode(res.body)['data'] as List;
-      data = decoded.map((e) => SalesPlacesModel.fromJson(e)).toList();
+      final decoded = jsonDecode(res.body)['data'] as List?;
+      if (decoded != null) {
+        data = decoded.map((e) => SalesPlacesModel.fromJson(e)).toList();
+      } else {
+        data = [];
+      }
     } else {
       Toast.show('حصل خطأ غير متوقع حاول ثانية', duration: Toast.lengthLong);
     }

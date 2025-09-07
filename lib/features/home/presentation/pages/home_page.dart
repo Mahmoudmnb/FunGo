@@ -1,15 +1,18 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fun_go_app/features/places/models/sales_places_model.dart';
 
+import '../../../../core/constants.dart';
 import '../../../../shared/widgets/place_card.dart';
 import '../../../favorites/methods/favorite_method.dart';
 import '../../../favorites/presentation/pages/favorites_page.dart';
 import '../../../offers/presentation/pages/offers_page.dart';
 import '../../../places/models/place_cart_model.dart';
+import '../../../places/models/sales_places_model.dart';
 import '../../../places/presentation/pages/place_page.dart';
 import '../../../places/presentation/widgets/logo_widget.dart';
+import '../../../trip/methods/trip_methods.dart';
+import '../../../trip/models/trip_model.dart';
 import '../../../trip/presentation/pages/trip_page.dart';
 import '../../methods/place_methods.dart';
 import '../providers/home_providers.dart';
@@ -26,12 +29,15 @@ class _HomePageState extends ConsumerState<HomePage> {
   late Future<List<PlaceCartModel>?> getPlacesMethod;
   late Future<List<PlaceCartModel>?> getFavoriteMethod;
   late Future<List<SalesPlacesModel>?> getSalesMethod;
+  late Future<List<TripModel>?> getTripMethod;
 
   @override
   void initState() {
     getPlacesMethod = getPlacesWithFilter(context: context, cityFilter: '');
     getFavoriteMethod = getFavorites(context: context);
     getSalesMethod = getSales(context: context);
+    getTripMethod = getTrips(context: context);
+
     super.initState();
   }
 
@@ -80,13 +86,16 @@ class _HomePageState extends ConsumerState<HomePage> {
           } else if (snapshot.hasData) {
             return _buildPlacesList(snapshot.data!);
           } else {
-            return IconButton(
-                onPressed: () {
-                  getPlacesMethod =
-                      getPlacesWithFilter(context: context, cityFilter: '');
-                  setState(() {});
-                },
-                icon: const Icon(Icons.replay_outlined));
+            return SizedBox(
+              height: 600,
+              child: IconButton(
+                  onPressed: () {
+                    getPlacesMethod =
+                        getPlacesWithFilter(context: context, cityFilter: '');
+                    setState(() {});
+                  },
+                  icon: const Icon(Icons.replay_outlined)),
+            );
           }
         },
       ),
@@ -118,7 +127,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasData) {
-            return const OffersPage();
+            return OffersPage(sales: snapshot.data!);
           } else {
             return Center(
               child: IconButton(
@@ -134,7 +143,28 @@ class _HomePageState extends ConsumerState<HomePage> {
           }
         },
       ),
-      const TripPage(),
+      FutureBuilder(
+        future: getTripMethod,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasData) {
+            return TripPage(trips: snapshot.data!);
+          } else {
+            return Center(
+              child: IconButton(
+                  onPressed: () {
+                    getSalesMethod = getSales(context: context);
+                    setState(() {});
+                  },
+                  icon: const Icon(
+                    Icons.replay_outlined,
+                    size: 30,
+                  )),
+            );
+          }
+        },
+      )
     ];
 
     return Scaffold(
@@ -144,21 +174,26 @@ class _HomePageState extends ConsumerState<HomePage> {
         backgroundColor: Colors.grey[100],
         centerTitle: true,
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: FilterIconButton(onPressed: () async {
-              await showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                useSafeArea: true,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-                ),
-                builder: (_) => const FilterBottomSheet(),
-              );
-              // بعد الإغلاق: الفلترة تتحدث تلقائياً
-            }),
-          ),
+          _pageIndex == 0
+              ? Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: FilterIconButton(onPressed: () async {
+                    await showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      useSafeArea: true,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(24)),
+                      ),
+                      builder: (_) => FilterBottomSheet(
+                        onFilter: (p0, p1, p2, p3) {},
+                      ),
+                    );
+                    // بعد الإغلاق: الفلترة تتحدث تلقائياً
+                  }),
+                )
+              : const SizedBox.shrink(),
         ],
       ),
 
@@ -173,13 +208,25 @@ class _HomePageState extends ConsumerState<HomePage> {
           items: navItems,
           index: _pageIndex,
           onTap: (index) {
-            getPlacesMethod =
-                getPlacesWithFilter(context: context, cityFilter: '');
-            getFavoriteMethod = getFavorites(context: context);
-            getSalesMethod = getSales(context: context);
-            setState(() {
-              _pageIndex = index;
-            });
+            if (index != _pageIndex) {
+              switch (index) {
+                case 0:
+                  getPlacesMethod =
+                      getPlacesWithFilter(context: context, cityFilter: '');
+                  break;
+                case 1:
+                  getFavoriteMethod = getFavorites(context: context);
+                  break;
+                case 2:
+                  getSalesMethod = getSales(context: context);
+                  break;
+                default:
+                  getTripMethod = getTrips(context: context);
+              }
+              setState(() {
+                _pageIndex = index;
+              });
+            }
           },
         ),
       ),
@@ -194,10 +241,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                   getPlacesWithFilter(context: context, cityFilter: text);
               setState(() {});
             }),
+            pages[_pageIndex]
+          ] else
             Expanded(child: pages[_pageIndex]),
-          ] else ...[
-            Expanded(child: pages[_pageIndex]),
-          ],
         ],
       ),
     );
@@ -244,7 +290,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     : Colors.teal.shade900,
               ),
               onSelected: (_) {
-                onTap('province');
+                onTap(getEnglishCityName(province));
                 ref.read(selectedProvinceProvider.notifier).state = province;
               },
             );
@@ -265,41 +311,45 @@ class _HomePageState extends ConsumerState<HomePage> {
     }
 
     return StatefulBuilder(
-      builder: (context, setState) => ListView.builder(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        itemCount: places.length,
-        itemBuilder: (context, index) {
-          final place = places[index];
+      builder: (context, setState) => SizedBox(
+        height: 620,
+        width: MediaQuery.sizeOf(context).width,
+        child: ListView.builder(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          shrinkWrap: true,
+          itemCount: places.length,
+          itemBuilder: (context, index) {
+            final place = places[index];
 
-          // final favorites = ref.watch(favoritesProvider);
-          // final isFavorite = favorites.any((p) => p.id == place.id);
-          return PlaceCard(
-            type: 1,
-            place: place,
-            isFavorite: place.isFavorite,
-            onTap: () async {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => PlacePage(id: place.id!)),
-              );
-            },
-            onfav: () async {
-              // ref.read(favoritesProvider.notifier).toggleFavorite(place);
-
-              final msg = place.isFavorite
-                  ? 'تمت إزالة المكان من المفضلة'
-                  : 'تمت إضافة المكان إلى المفضلة';
-              place.isFavorite = !place.isFavorite;
-              setState(() {});
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text(msg)));
-              await addOrDeletePlaceFromFavorite(
-                  context: context,
-                  id: place.id!,
-                  isFavorite: place.isFavorite);
-            },
-          );
-        },
+            // final favorites = ref.watch(favoritesProvider);
+            // final isFavorite = favorites.any((p) => p.id == place.id);
+            return PlaceCard(
+              type: 1,
+              place: place,
+              isFavorite: place.isFavorite,
+              onTap: () async {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => PlacePage(id: place.id!)),
+                );
+              },
+              onfav: () async {
+                // ref.read(favoritesProvider.notifier).toggleFavorite(place);
+                final msg = place.isFavorite
+                    ? 'تمت إزالة المكان من المفضلة'
+                    : 'تمت إضافة المكان إلى المفضلة';
+                place.isFavorite = !place.isFavorite;
+                setState(() {});
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(content: Text(msg)));
+                await addOrDeletePlaceFromFavorite(
+                    context: context,
+                    id: place.id!,
+                    isFavorite: place.isFavorite);
+              },
+            );
+          },
+        ),
       ),
     );
   }

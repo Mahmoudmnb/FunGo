@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../data/model/offer_model.dart';
+
+import '../../../places/models/sales_places_model.dart';
 
 class OfferCard extends StatelessWidget {
-  final OfferModel offer;
+  final SalesPlacesModel sales;
   final VoidCallback onTap;
   final VoidCallback onFavorite;
   final bool isFavorite;
 
   const OfferCard({
     super.key,
-    required this.offer,
+    required this.sales,
     required this.onTap,
     required this.onFavorite,
     required this.isFavorite,
@@ -23,7 +24,7 @@ class OfferCard extends StatelessWidget {
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
-        onTap: onTap,
+        // onTap: onTap,
         borderRadius: BorderRadius.circular(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,7 +38,7 @@ class OfferCard extends StatelessWidget {
                     topRight: Radius.circular(16),
                   ),
                   child: Image.network(
-                    offer.imageUrl,
+                    sales.image!,
                     height: 200,
                     width: double.infinity,
                     fit: BoxFit.cover,
@@ -57,66 +58,66 @@ class OfferCard extends StatelessWidget {
                 ),
 
                 // Discount badge
-                Positioned(
-                  top: 12,
-                  left: 12,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.red.shade600,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Text(
-                      '${offer.discountPercentage}% خصم',
-                      style: GoogleFonts.cairo(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
+                // Positioned(
+                //   top: 12,
+                //   left: 12,
+                //   child: Container(
+                //     padding: const EdgeInsets.symmetric(
+                //       horizontal: 12,
+                //       vertical: 6,
+                //     ),
+                //     decoration: BoxDecoration(
+                //       color: Colors.red.shade600,
+                //       borderRadius: BorderRadius.circular(20),
+                //       boxShadow: [
+                //         BoxShadow(
+                //           color: Colors.black.withOpacity(0.2),
+                //           blurRadius: 4,
+                //           offset: const Offset(0, 2),
+                //         ),
+                //       ],
+                //     ),
+                //     child: Text(
+                //       '${offer.discountPercentage}% خصم',
+                //       style: GoogleFonts.cairo(
+                //         color: Colors.white,
+                //         fontSize: 14,
+                //         fontWeight: FontWeight.bold,
+                //       ),
+                //     ),
+                //   ),
+                // ),
 
                 // Favorite button
-                Positioned(
-                  top: 12,
-                  right: 12,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.9),
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: IconButton(
-                      icon: Icon(
-                        isFavorite ? Icons.favorite : Icons.favorite_border,
-                        color: isFavorite ? Colors.red : Colors.grey.shade600,
-                        size: 24,
-                      ),
-                      onPressed: onFavorite,
-                      constraints: const BoxConstraints(
-                        minWidth: 40,
-                        minHeight: 40,
-                      ),
-                    ),
-                  ),
-                ),
+                // Positioned(
+                //   top: 12,
+                //   right: 12,
+                //   child: Container(
+                //     decoration: BoxDecoration(
+                //       color: Colors.white.withOpacity(0.9),
+                //       shape: BoxShape.circle,
+                //       boxShadow: [
+                //         BoxShadow(
+                //           color: Colors.black.withOpacity(0.1),
+                //           blurRadius: 4,
+                //           offset: const Offset(0, 2),
+                //         ),
+                //       ],
+                //     ),
+                //     child: IconButton(
+                //       icon: Icon(
+                //         isFavorite ? Icons.favorite : Icons.favorite_border,
+                //         color: isFavorite ? Colors.red : Colors.grey.shade600,
+                //         size: 24,
+                //       ),
+                //       onPressed: onFavorite,
+                //       constraints: const BoxConstraints(
+                //         minWidth: 40,
+                //         minHeight: 40,
+                //       ),
+                //     ),
+                //   ),
+                // ),
 
                 // Offer type badge
                 Positioned(
@@ -132,7 +133,7 @@ class OfferCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      offer.offerType,
+                      sales.title!,
                       style: GoogleFonts.cairo(
                         color: Colors.white,
                         fontSize: 12,
@@ -148,27 +149,31 @@ class OfferCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   // Title and location
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Expanded(
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Text(
-                              offer.name,
+                              sales.title!,
                               style: GoogleFonts.cairo(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.grey.shade800,
                               ),
+                              textAlign: TextAlign.end,
+                              textDirection: TextDirection.rtl,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 4),
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 Icon(
                                   Icons.location_on,
@@ -177,7 +182,7 @@ class OfferCard extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  offer.location,
+                                  sales.placeName!,
                                   style: GoogleFonts.cairo(
                                     fontSize: 14,
                                     color: Colors.grey.shade600,
@@ -195,12 +200,13 @@ class OfferCard extends StatelessWidget {
 
                   // Description
                   Text(
-                    offer.description,
+                    sales.body!,
                     style: GoogleFonts.cairo(
                       fontSize: 14,
                       color: Colors.grey.shade700,
                       height: 1.4,
                     ),
+                    textAlign: TextAlign.end,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -211,26 +217,26 @@ class OfferCard extends StatelessWidget {
                   Row(
                     children: [
                       // Original price (crossed out)
-                      Text(
-                        '${offer.originalPrice.toStringAsFixed(0)} ل.س',
-                        style: GoogleFonts.cairo(
-                          fontSize: 16,
-                          color: Colors.grey.shade500,
-                          decoration: TextDecoration.lineThrough,
-                        ),
-                      ),
+                      // Text(
+                      //   '${offer.originalPrice.toStringAsFixed(0)} ل.س',
+                      //   style: GoogleFonts.cairo(
+                      //     fontSize: 16,
+                      //     color: Colors.grey.shade500,
+                      //     decoration: TextDecoration.lineThrough,
+                      //   ),
+                      // ),
 
-                      const SizedBox(width: 12),
+                      // const SizedBox(width: 12),
 
-                      // Discounted price
-                      Text(
-                        '${offer.discountedPrice.toStringAsFixed(0)} ل.س',
-                        style: GoogleFonts.cairo(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.red.shade600,
-                        ),
-                      ),
+                      // // Discounted price
+                      // Text(
+                      //   '${offer.discountedPrice.toStringAsFixed(0)} ل.س',
+                      //   style: GoogleFonts.cairo(
+                      //     fontSize: 20,
+                      //     fontWeight: FontWeight.bold,
+                      //     color: Colors.red.shade600,
+                      //   ),
+                      // ),
 
                       const Spacer(),
 
@@ -245,7 +251,8 @@ class OfferCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          _getValidityText(offer.validUntil),
+                          // _getValidityText(),
+                          sales.remainingdays!,
                           style: GoogleFonts.cairo(
                             fontSize: 12,
                             color: Colors.orange.shade800,
@@ -273,7 +280,7 @@ class OfferCard extends StatelessWidget {
                       ),
                       onPressed: onTap,
                       child: Text(
-                        'احجز الآن',
+                        'اظهار التفاصيل',
                         style: GoogleFonts.cairo(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,

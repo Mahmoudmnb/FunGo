@@ -78,3 +78,40 @@ Future checkInternet(Future Function() fun, BuildContext? context) async {
     }
   }
 }
+
+String getEnglishCityName(String arabicName) {
+  switch (arabicName) {
+    case 'دمشق':
+      return 'damascus';
+    case 'حلب':
+      return 'aleppo';
+    case 'حمص':
+      return 'homs';
+    case 'اللاذقية':
+      return 'latakia';
+    case 'طرطوس':
+      return 'tartous';
+    case 'بانياس':
+      return 'banias';
+    case 'إدلب':
+      return 'idlib';
+    case 'درعا':
+      return 'deraa';
+    case 'السويداء':
+      return 'sweida';
+    case 'الرقة':
+      return 'raqqa';
+    case 'دير الزور':
+      return 'deir_ezzor';
+    case 'الحسكة':
+      return 'hasakah';
+    case 'القامشلي':
+      return 'qamisli';
+    case 'تدمر':
+      return 'palmyra';
+    case 'الكل':
+      return 'palmyra';
+    default:
+      return 'aaaaaaaa';
+  }
+}

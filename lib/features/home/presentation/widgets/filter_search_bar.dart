@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../providers/home_providers.dart';
 import 'filter_sheet.dart';
 
@@ -27,7 +28,9 @@ class FilterSearchBar extends ConsumerWidget {
                       top: Radius.circular(24),
                     ),
                   ),
-                  builder: (_) => const FilterBottomSheet(),
+                  builder: (_) => FilterBottomSheet(
+                    onFilter: (p0, p1, p2, p3) {},
+                  ),
                 );
               },
             ),
@@ -37,24 +40,20 @@ class FilterSearchBar extends ConsumerWidget {
               child: TextField(
                 textDirection: TextDirection.rtl,
                 textInputAction: TextInputAction.search,
-                onChanged:
-                    (v) => ref.read(searchQueryProvider.notifier).state = v,
+                onChanged: (v) =>
+                    ref.read(searchQueryProvider.notifier).state = v,
                 decoration: InputDecoration(
                   hintText: 'ابحث عن مكان…',
                   filled: true,
                   fillColor: Colors.teal.shade50,
                   prefixIcon: const Icon(Icons.search_rounded),
-                  suffixIcon:
-                      (query.isNotEmpty)
-                          ? IconButton(
-                            onPressed:
-                                () =>
-                                    ref
-                                        .read(searchQueryProvider.notifier)
-                                        .state = '',
-                            icon: const Icon(Icons.close_rounded),
-                          )
-                          : null,
+                  suffixIcon: (query.isNotEmpty)
+                      ? IconButton(
+                          onPressed: () =>
+                              ref.read(searchQueryProvider.notifier).state = '',
+                          icon: const Icon(Icons.close_rounded),
+                        )
+                      : null,
                   contentPadding: const EdgeInsets.symmetric(
                     vertical: 12,
                     horizontal: 14,

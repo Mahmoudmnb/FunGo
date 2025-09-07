@@ -26,7 +26,11 @@ class FilterIconButton extends StatelessWidget {
 }
 
 class FilterBottomSheet extends ConsumerWidget {
-  const FilterBottomSheet({super.key});
+  final Function(bool, bool, bool, bool) onFilter;
+  const FilterBottomSheet({
+    super.key,
+    required this.onFilter,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -55,88 +59,139 @@ class FilterBottomSheet extends ConsumerWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                width: 40,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              const SizedBox(height: 16),
+              // Container(
+              //   width: 40,
+              //   height: 5,
+              //   decoration: BoxDecoration(
+              //     color: Colors.grey.shade300,
+              //     borderRadius: BorderRadius.circular(10),
+              //   ),
+              // ),
+              // const SizedBox(height: 16),
 
-              // Rating slider without the "bubble" value indicator
-              Row(
-                children: [
-                  SizedBox(
-                      width: 80,
-                      child: Text('التقييم (الأدنى)',
-                          style: Theme.of(context).textTheme.titleMedium)),
-                  Expanded(
-                    child: SliderTheme(
-                      data: SliderTheme.of(context).copyWith(
-                        showValueIndicator: ShowValueIndicator.never,
-                        trackHeight: 4,
-                        thumbShape:
-                            const RoundSliderThumbShape(enabledThumbRadius: 9),
-                      ),
-                      child: Slider(
-                        value: (rating ?? 0),
-                        min: 0,
-                        max: 5,
-                        divisions: 5,
-                        label: '', // نخليها فارغة حتى لا تظهر
-                        activeColor: Colors.teal.shade700,
-                        onChanged: (v) => ref
-                            .read(selectedRatingProvider.notifier)
-                            .state = (v == 0) ? null : v,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              // // Rating slider without the "bubble" value indicator
+              // Row(
+              //   children: [
+              //     SizedBox(
+              //         width: 80,
+              //         child: Text('التقييم (الأدنى)',
+              //             style: Theme.of(context).textTheme.titleMedium)),
+              //     Expanded(
+              //       child: SliderTheme(
+              //         data: SliderTheme.of(context).copyWith(
+              //           showValueIndicator: ShowValueIndicator.never,
+              //           trackHeight: 4,
+              //           thumbShape:
+              //               const RoundSliderThumbShape(enabledThumbRadius: 9),
+              //         ),
+              //         child: Slider(
+              //           value: (rating ?? 0),
+              //           min: 0,
+              //           max: 5,
+              //           divisions: 5,
+              //           label: '', // نخليها فارغة حتى لا تظهر
+              //           activeColor: Colors.teal.shade700,
+              //           onChanged: (v) => ref
+              //               .read(selectedRatingProvider.notifier)
+              //               .state = (v == 0) ? null : v,
+              //         ),
+              //       ),
+              //     ),
+              //   ],
+              // ),
 
-              const SizedBox(height: 8),
+              // const SizedBox(height: 8),
 
-              // Budget slider: يعرض الحد الأقصى للميزانية، والفرز حسب الميزانية سيتم تطبيقه في provider
-              Row(
-                children: [
-                  SizedBox(
-                      width: 80,
-                      child: Text('ميزانيتي (أقصى)',
-                          style: Theme.of(context).textTheme.titleMedium)),
-                  Expanded(
-                    child: SliderTheme(
-                      data: SliderTheme.of(context).copyWith(
-                        showValueIndicator: ShowValueIndicator.never,
-                        trackHeight: 4,
-                        thumbShape:
-                            const RoundSliderThumbShape(enabledThumbRadius: 9),
-                      ),
-                      child: Slider(
-                        value: (budget ?? 0),
-                        min: 0,
-                        max: 500,
-                        divisions: 20,
-                        label: '',
-                        activeColor: Colors.teal.shade700,
-                        onChanged: (v) => ref
-                            .read(selectedBudgetProvider.notifier)
-                            .state = (v == 0) ? null : v,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              // // Budget slider: يعرض الحد الأقصى للميزانية، والفرز حسب الميزانية سيتم تطبيقه في provider
+              // Row(
+              //   children: [
+              //     SizedBox(
+              //         width: 80,
+              //         child: Text('ميزانيتي (أقصى)',
+              //             style: Theme.of(context).textTheme.titleMedium)),
+              //     Expanded(
+              //       child: SliderTheme(
+              //         data: SliderTheme.of(context).copyWith(
+              //           showValueIndicator: ShowValueIndicator.never,
+              //           trackHeight: 4,
+              //           thumbShape:
+              //               const RoundSliderThumbShape(enabledThumbRadius: 9),
+              //         ),
+              //         child: Slider(
+              //           value: (budget ?? 0),
+              //           min: 0,
+              //           max: 500,
+              //           divisions: 20,
+              //           label: '',
+              //           activeColor: Colors.teal.shade700,
+              //           onChanged: (v) => ref
+              //               .read(selectedBudgetProvider.notifier)
+              //               .state = (v == 0) ? null : v,
+              //         ),
+              //       ),
+              //     ),
+              //   ],
+              // ),
 
-              const SizedBox(height: 12),
+              // const SizedBox(height: 12),
 
               // Location switch (كما كان)
+// https://fungo.mustafafares.com/api/places/index?filters[]=nearest&activity_type_id=1&governorate=aleppo&longitude=36.8&latitude=25.6
+// ?filters[]=cheapest&filters[]=offers&filters[]=rating&filters[]=nearest&activity_type_id=1&governorate=aleppo
               Row(
                 children: [
                   SizedBox(
-                      width: 80,
-                      child: Text('موقعي',
+                      width: 300,
+                      child: Text('فلترة حسب الأرخص',
+                          style: Theme.of(context).textTheme.titleMedium)),
+                  Expanded(
+                    child: Switch(
+                      value: location ?? false,
+                      activeColor: Colors.teal.shade700,
+                      onChanged: (v) =>
+                          ref.read(selectedLocationProvider.notifier).state = v,
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                      width: 300,
+                      child: Text('فلترة حسب التقييم',
+                          style: Theme.of(context).textTheme.titleMedium)),
+                  Expanded(
+                    child: Switch(
+                      value: location ?? false,
+                      activeColor: Colors.teal.shade700,
+                      onChanged: (v) =>
+                          ref.read(selectedLocationProvider.notifier).state = v,
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                      width: 300,
+                      child: Text('إظهار فقط الاماكن التي تحوي حسومات',
+                          style: Theme.of(context).textTheme.titleMedium)),
+                  Expanded(
+                    child: Switch(
+                      value: location ?? false,
+                      activeColor: Colors.teal.shade700,
+                      onChanged: (v) =>
+                          ref.read(selectedLocationProvider.notifier).state = v,
+                    ),
+                  ),
+                ],
+              ),
+
+              Row(
+                children: [
+                  SizedBox(
+                      width: 300,
+                      child: Text('الأقرب الي',
                           style: Theme.of(context).textTheme.titleMedium)),
                   Expanded(
                     child: Switch(
@@ -152,48 +207,48 @@ class FilterBottomSheet extends ConsumerWidget {
               const SizedBox(height: 12),
 
               // Activities chips (اختاري نوع النشاط لفلترة الأماكن)
-              if (activityList.isNotEmpty) ...[
-                Align(
-                    alignment: Alignment.centerRight,
-                    child: Text('الأنشطة',
-                        style: Theme.of(context).textTheme.titleMedium)),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    ChoiceChip(
-                      label: const Text('الكل'),
-                      selected: selectedActivity == null,
-                      selectedColor: Colors.teal.shade700,
-                      backgroundColor: Colors.teal.shade200,
-                      labelStyle: TextStyle(
-                          color: selectedActivity == null
-                              ? Colors.white
-                              : Colors.teal.shade900),
-                      onSelected: (_) => ref
-                          .read(selectedActivityProvider.notifier)
-                          .state = null,
-                    ),
-                    ...activityList.map((act) {
-                      final selected = act == selectedActivity;
-                      return ChoiceChip(
-                        label: Text(act),
-                        selected: selected,
-                        selectedColor: Colors.teal.shade700,
-                        backgroundColor: Colors.teal.shade200,
-                        labelStyle: TextStyle(
-                            color:
-                                selected ? Colors.white : Colors.teal.shade900),
-                        onSelected: (_) => ref
-                            .read(selectedActivityProvider.notifier)
-                            .state = selected ? null : act,
-                      );
-                    }),
-                  ],
-                ),
-                const SizedBox(height: 12),
-              ],
+              // if (activityList.isNotEmpty) ...[
+              //   Align(
+              //       alignment: Alignment.centerRight,
+              //       child: Text('الأنشطة',
+              //           style: Theme.of(context).textTheme.titleMedium)),
+              //   const SizedBox(height: 8),
+              //   Wrap(
+              //     spacing: 8,
+              //     runSpacing: 8,
+              //     children: [
+              //       ChoiceChip(
+              //         label: const Text('الكل'),
+              //         selected: selectedActivity == null,
+              //         selectedColor: Colors.teal.shade700,
+              //         backgroundColor: Colors.teal.shade200,
+              //         labelStyle: TextStyle(
+              //             color: selectedActivity == null
+              //                 ? Colors.white
+              //                 : Colors.teal.shade900),
+              //         onSelected: (_) => ref
+              //             .read(selectedActivityProvider.notifier)
+              //             .state = null,
+              //       ),
+              //       ...activityList.map((act) {
+              //         final selected = act == selectedActivity;
+              //         return ChoiceChip(
+              //           label: Text(act),
+              //           selected: selected,
+              //           selectedColor: Colors.teal.shade700,
+              //           backgroundColor: Colors.teal.shade200,
+              //           labelStyle: TextStyle(
+              //               color:
+              //                   selected ? Colors.white : Colors.teal.shade900),
+              //           onSelected: (_) => ref
+              //               .read(selectedActivityProvider.notifier)
+              //               .state = selected ? null : act,
+              //         );
+              //       }),
+              //     ],
+              //   ),
+              //   const SizedBox(height: 12),
+              // ],
 
               SizedBox(
                 width: double.infinity,

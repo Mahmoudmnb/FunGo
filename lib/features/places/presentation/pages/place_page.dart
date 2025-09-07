@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fun_go_app/features/places/presentation/widgets/favorite_icon.dart';
 
+import '../../../favorites/methods/favorite_method.dart';
 import '../../../home/methods/place_methods.dart';
+import '../../../offers/presentation/pages/offers_page.dart';
+import '../../../trip/methods/trip_methods.dart';
+import '../../../trip/models/trip_model.dart';
 import '../../../trip/presentation/pages/trip_page.dart';
 import '../../models/place_model.dart';
+import '../../models/sales_places_model.dart';
+import '../widgets/favorite_icon.dart';
 import '../widgets/place_image_slider.dart';
 import '../widgets/story_section.dart';
 
@@ -24,6 +29,7 @@ class _PlacePageState extends ConsumerState<PlacePage> {
   final PageController _pageController = PageController();
   final TextEditingController _commentController = TextEditingController();
   Future<PlaceModel?>? getFavoriteMethod;
+  bool isLoading = false;
 
   @override
   void dispose() {
@@ -82,31 +88,66 @@ class _PlacePageState extends ConsumerState<PlacePage> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         FavoriteIcon(place: place),
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => const TripPage()));
-                          },
-                          icon: const Icon(Icons.airplane_ticket),
-                          label: const Text("رحلتي"),
+                        StatefulBuilder(
+                          builder: (context, setState) => ElevatedButton.icon(
+                            onPressed: () async {
+                              isLoading = true;
+                              setState(() {});
+                              List<TripModel>? trips =
+                                  await getTrips(context: context);
+                              isLoading = false;
+                              setState(() {});
+                              if (trips != null && context.mounted) {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) =>
+                                            TripPage(trips: trips)));
+                              }
+                            },
+                            icon: isLoading
+                                ? const SizedBox.shrink()
+                                : const Icon(Icons.airplane_ticket),
+                            label: isLoading
+                                ? const CircularProgressIndicator()
+                                : const Text("رحلتي"),
+                          ),
                         ),
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            // if (offers.isNotEmpty) {
-                            //   Navigator.push(
-                            //     context,
-                            //     MaterialPageRoute(builder: (_) => OffersPage(placeId: place.id)),
-                            //   );
-                            // } else {
-                            //   ScaffoldMessenger.of(context).showSnackBar(
-                            //     const SnackBar(content: Text('⚠️ لا يوجد عروض لهذا المكان')),
-                            //   );
-                            // }
-                          },
-                          icon: const Icon(Icons.local_offer),
-                          label: const Text("العروض"),
+                        StatefulBuilder(
+                          builder: (context, setState) => ElevatedButton.icon(
+                            onPressed: () async {
+                              // if (offers.isNotEmpty) {
+                              //   Navigator.push(
+                              //     context,
+                              //     MaterialPageRoute(builder: (_) => OffersPage(placeId: place.id)),
+                              //   );
+                              // } else {
+                              //   ScaffoldMessenger.of(context).showSnackBar(
+                              //     const SnackBar(content: Text('⚠️ لا يوجد عروض لهذا المكان')),
+                              //   );
+                              // }
+
+                              isLoading = true;
+                              setState(() {});
+                              List<SalesPlacesModel>? sales = await getSales(
+                                  context: context, placeId: place.id);
+                              isLoading = false;
+                              setState(() {});
+                              if (sales != null && context.mounted) {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) =>
+                                            OffersPage(sales: sales)));
+                              }
+                            },
+                            icon: isLoading
+                                ? const SizedBox.shrink()
+                                : const Icon(Icons.local_offer),
+                            label: isLoading
+                                ? const CircularProgressIndicator()
+                                : const Text("العروض"),
+                          ),
                         ),
                       ],
                     ),

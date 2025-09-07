@@ -2,8 +2,8 @@ class SalesPlacesModel {
   int? id;
   String? title;
   String? body;
-  String? startDate;
-  String? endDate;
+  // String? startDate;
+  String? remainingdays;
   int? placeId;
   String? placeName;
   String? image;
@@ -12,8 +12,8 @@ class SalesPlacesModel {
       {this.id,
       this.title,
       this.body,
-      this.startDate,
-      this.endDate,
+      // this.startDate,
+      this.remainingdays,
       this.placeId,
       this.placeName,
       this.image});
@@ -22,10 +22,10 @@ class SalesPlacesModel {
     id = json['id'];
     title = json['title'];
     body = json['body'];
-    startDate = json['startDate'];
-    endDate = json['endDate'];
+    // startDate = json['startDate'];
+    remainingdays = json['remaining_days'];
     placeId = json['placeId'];
-    placeName = json['placeName'];
+    placeName = json['placegovernorate'];
     image = json['image'];
   }
 
@@ -34,8 +34,8 @@ class SalesPlacesModel {
     data['id'] = id;
     data['title'] = title;
     data['body'] = body;
-    data['startDate'] = startDate;
-    data['endDate'] = endDate;
+    // data['startDate'] = startDate;
+    data['remaining_days'] = remainingdays;
     data['placeId'] = placeId;
     data['placeName'] = placeName;
     data['image'] = image;

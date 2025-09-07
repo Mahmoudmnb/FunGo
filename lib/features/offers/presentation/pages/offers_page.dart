@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/constants.dart';
+import '../../../places/models/sales_places_model.dart';
 import '../../data/model/offer_model.dart';
 import '../pages/offer_details_page.dart';
 import '../widgets/offer_card.dart';
 
 class OffersPage extends StatefulWidget {
-  const OffersPage({super.key});
+  final List<SalesPlacesModel> sales;
+  const OffersPage({
+    super.key,
+    required this.sales,
+  });
 
   @override
   State<OffersPage> createState() => _OffersPageState();
@@ -39,13 +45,15 @@ class _OffersPageState extends State<OffersPage> {
   String? _selectedOfferType;
   String? _selectedLocation;
 
+  late List<SalesPlacesModel> sales;
+
   // Filtered offers
   late List<OfferModel> _filteredOffers;
 
   @override
   void initState() {
     super.initState();
-
+    sales = widget.sales;
     _allOffers = [
       OfferModel(
         id: 1,
@@ -133,20 +141,20 @@ class _OffersPageState extends State<OffersPage> {
     final searchQuery = _searchController.text.toLowerCase();
 
     setState(() {
-      _filteredOffers = _allOffers.where((offer) {
-        final matchesSearch = offer.name.toLowerCase().contains(searchQuery) ||
-            offer.description.toLowerCase().contains(searchQuery) ||
-            offer.location.toLowerCase().contains(searchQuery);
+      sales = sales.where((offer) {
+        // final matchesSearch = offer.name.toLowerCase().contains(searchQuery) ||
+        //     offer.description.toLowerCase().contains(searchQuery) ||
+        //     offer.location.toLowerCase().contains(searchQuery);
 
-        final matchesType = _selectedOfferType == null ||
-            _selectedOfferType == 'الكل' ||
-            offer.offerType == _selectedOfferType;
+        // final matchesType = _selectedOfferType == null ||
+        //     _selectedOfferType == 'الكل' ||
+        //     offer.offerType == _selectedOfferType;
 
         final matchesLocation = _selectedLocation == null ||
             _selectedLocation == 'الكل' ||
-            offer.location == _selectedLocation;
+            offer.placeName == getEnglishCityName(_selectedLocation ?? 'الكل');
 
-        return matchesSearch && matchesType && matchesLocation;
+        return matchesLocation;
       }).toList();
     });
   }
@@ -171,79 +179,80 @@ class _OffersPageState extends State<OffersPage> {
       body: Column(
         children: [
           // Search and filter section
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                const SizedBox(height: 16),
+          // Container(
+          //   padding: const EdgeInsets.all(16),
+          //   decoration: BoxDecoration(
+          //     color: Colors.white,
+          //     boxShadow: [
+          //       BoxShadow(
+          //         color: Colors.grey.withOpacity(0.1),
+          //         blurRadius: 4,
+          //         offset: const Offset(0, 2),
+          //       ),
+          //     ],
+          //   ),
+          //   child: Column(
+          //     children: [
+          //       const SizedBox(height: 16),
 
-                const SizedBox(height: 12),
+          //       const SizedBox(height: 12),
 
-                // Location filter
-                Row(
-                  children: [
-                    Text(
-                      'الموقع:',
-                      style: GoogleFonts.cairo(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey.shade700,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: _locations.map((location) {
-                            final isSelected = _selectedLocation == location ||
-                                (_selectedLocation == null &&
-                                    location == 'الكل');
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 8),
-                              child: FilterChip(
-                                label: Text(
-                                  location,
-                                  style: GoogleFonts.cairo(
-                                    color: isSelected
-                                        ? Colors.teal.shade700
-                                        : Colors.teal.shade700,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                selected: isSelected,
-                                selectedColor: Colors.teal.shade600,
-                                backgroundColor: Colors.white,
-                                onSelected: (_) {
-                                  _selectedLocation =
-                                      location == 'الكل' ? null : location;
-                                  _filterOffers();
-                                },
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
+          //       // Location filter
+          //       Row(
+          //         children: [
+          //           Expanded(
+          //             child: SingleChildScrollView(
+          //               scrollDirection: Axis.horizontal,
+          //               reverse: true,
+          //               child: Row(
+          //                 children: _locations.reversed.map((location) {
+          //                   final isSelected = _selectedLocation == location ||
+          //                       (_selectedLocation == null &&
+          //                           location == 'الكل');
+          //                   return Padding(
+          //                     padding: const EdgeInsets.only(right: 8),
+          //                     child: FilterChip(
+          //                       label: Text(
+          //                         location,
+          //                         style: GoogleFonts.cairo(
+          //                           color: isSelected
+          //                               ? Colors.white
+          //                               : Colors.teal.shade700,
+          //                           fontSize: 12,
+          //                         ),
+          //                       ),
+          //                       selected: isSelected,
+          //                       selectedColor: Colors.teal.shade600,
+          //                       backgroundColor: Colors.white,
+          //                       onSelected: (_) {
+          //                         _selectedLocation =
+          //                             location == 'الكل' ? null : location;
+          //                         _filterOffers();
+          //                       },
+          //                     ),
+          //                   );
+          //                 }).toList(),
+          //               ),
+          //             ),
+          //           ),
+          //           const SizedBox(width: 12),
+          //           Text(
+          //             ' : الموقع',
+          //             style: GoogleFonts.cairo(
+          //               fontSize: 14,
+          //               fontWeight: FontWeight.w600,
+          //               color: Colors.grey.shade700,
+          //             ),
+          //           ),
+          //         ],
+          //       ),
+          //     ],
+          //   ),
+          // ),
 
           // Offers list
           Expanded(
-            child: _filteredOffers.isEmpty
+            child: sales.isEmpty
                 ? Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -274,18 +283,19 @@ class _OffersPageState extends State<OffersPage> {
                   )
                 : ListView.builder(
                     padding: const EdgeInsets.symmetric(vertical: 8),
-                    itemCount: _filteredOffers.length,
+                    itemCount: sales.length,
                     itemBuilder: (context, index) {
-                      final offer = _filteredOffers[index];
+                      // final offer = _filteredOffers[index];
                       const isFavorite = false;
 
                       return OfferCard(
-                        offer: offer,
+                        sales: sales[index],
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => OfferDetailsPage(offer: offer),
+                              builder: (_) =>
+                                  OfferDetailsPage(sales: sales[index]),
                             ),
                           );
                         },
