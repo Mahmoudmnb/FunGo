@@ -2,30 +2,18 @@ import '../../domain/entities/offer.dart';
 
 class OfferModel extends Offer {
   OfferModel({
-    required int id,
-    required String name,
-    required String description,
-    required String imageUrl,
-    required String location,
-    required double originalPrice,
-    required double discountedPrice,
-    required int discountPercentage,
-    required DateTime validUntil,
-    required String offerType,
-    required bool isActive,
-  }) : super(
-         id: id,
-         name: name,
-         description: description,
-         imageUrl: imageUrl,
-         location: location,
-         originalPrice: originalPrice,
-         discountedPrice: discountedPrice,
-         discountPercentage: discountPercentage,
-         validUntil: validUntil,
-         offerType: offerType,
-         isActive: isActive,
-       );
+    required super.id,
+    required super.name,
+    required super.description,
+    required super.imageUrl,
+    required super.location,
+    required super.originalPrice,
+    required super.discountedPrice,
+    required super.discountPercentage,
+    required super.validUntil,
+    required super.offerType,
+    required super.isActive,
+  });
 
   factory OfferModel.fromJson(Map<String, dynamic> json) {
     return OfferModel(

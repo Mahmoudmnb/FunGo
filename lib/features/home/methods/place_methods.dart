@@ -24,9 +24,29 @@ Future<List<PlaceCartModel>?> getPlacesWithFilter({
         'Authorization': 'Bearer ${Constants.user!.token}',
       },
     );
-    if (res.statusCode == 200) {
+    http.Response favRes = await http.get(
+      Uri.parse(Constants.indexFavorite),
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ${Constants.user!.token}',
+      },
+    );
+    if (res.statusCode == 200 && favRes.statusCode == 200) {
       final decoded = jsonDecode(res.body)['data'] as List;
-      data = decoded.map((e) => PlaceCartModel.fromJson(e)).toList();
+      List favData = jsonDecode(favRes.body)['data'];
+
+      data = decoded.map((e) {
+        bool isFavorite = false;
+        for (var element in favData) {
+          if (element['id'] == e['id']) {
+            isFavorite = true;
+            break;
+          }
+        }
+        PlaceCartModel place = PlaceCartModel.fromJson(e);
+        place.isFavorite = isFavorite;
+        return place;
+      }).toList();
     } else {
       Toast.show('حصل خطأ غير متوقع حاول ثانية', duration: Toast.lengthLong);
     }
@@ -64,6 +84,7 @@ Future<PlaceModel?> getPlace({
       for (var element in favData) {
         if (element['id'] == data!.id!) {
           data!.isFavorite = true;
+          break;
         }
       }
     } else {

@@ -1,12 +1,11 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fun_go_app/features/places/models/sales_places_model.dart';
 
 import '../../../../shared/widgets/place_card.dart';
 import '../../../favorites/methods/favorite_method.dart';
 import '../../../favorites/presentation/pages/favorites_page.dart';
-import '../../../favorites/presentation/providers/favorites_provider.dart';
-// ✅ إضافات جديدة
 import '../../../offers/presentation/pages/offers_page.dart';
 import '../../../places/models/place_cart_model.dart';
 import '../../../places/presentation/pages/place_page.dart';
@@ -25,12 +24,14 @@ class HomePage extends ConsumerStatefulWidget {
 
 class _HomePageState extends ConsumerState<HomePage> {
   late Future<List<PlaceCartModel>?> getPlacesMethod;
-  late Future<List?> getFavoriteMethod;
+  late Future<List<PlaceCartModel>?> getFavoriteMethod;
+  late Future<List<SalesPlacesModel>?> getSalesMethod;
 
   @override
   void initState() {
     getPlacesMethod = getPlacesWithFilter(context: context, cityFilter: '');
     getFavoriteMethod = getFavorites(context: context);
+    getSalesMethod = getSales(context: context);
     super.initState();
   }
 
@@ -95,7 +96,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasData) {
-            return const FavoritesPage();
+            return FavoritesPage(places: snapshot.data!);
           } else {
             return Center(
               child: IconButton(
@@ -111,7 +112,28 @@ class _HomePageState extends ConsumerState<HomePage> {
           }
         },
       ),
-      const OffersPage(),
+      FutureBuilder(
+        future: getSalesMethod,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasData) {
+            return const OffersPage();
+          } else {
+            return Center(
+              child: IconButton(
+                  onPressed: () {
+                    getSalesMethod = getSales(context: context);
+                    setState(() {});
+                  },
+                  icon: const Icon(
+                    Icons.replay_outlined,
+                    size: 30,
+                  )),
+            );
+          }
+        },
+      ),
       const TripPage(),
     ];
 
@@ -151,6 +173,10 @@ class _HomePageState extends ConsumerState<HomePage> {
           items: navItems,
           index: _pageIndex,
           onTap: (index) {
+            getPlacesMethod =
+                getPlacesWithFilter(context: context, cityFilter: '');
+            getFavoriteMethod = getFavorites(context: context);
+            getSalesMethod = getSales(context: context);
             setState(() {
               _pageIndex = index;
             });
@@ -238,34 +264,43 @@ class _HomePageState extends ConsumerState<HomePage> {
       );
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      itemCount: places.length,
-      itemBuilder: (context, index) {
-        final place = places[index];
+    return StatefulBuilder(
+      builder: (context, setState) => ListView.builder(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        itemCount: places.length,
+        itemBuilder: (context, index) {
+          final place = places[index];
 
-        final favorites = ref.watch(favoritesProvider);
-        final isFavorite = favorites.any((p) => p.id == place.id);
-        return PlaceCard(
-          type: 1,
-          place: place,
-          isFavorite: isFavorite,
-          onTap: () async {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => PlacePage(id: place.id!)),
-            );
-          },
-          onfav: () {
-            // ref.read(favoritesProvider.notifier).toggleFavorite(place);
-            // final msg = isFavorite
-            //     ? 'تمت إزالة المكان من المفضلة'
-            //     : 'تمت إضافة المكان إلى المفضلة';
-            // ScaffoldMessenger.of(context)
-            //     .showSnackBar(SnackBar(content: Text(msg)));
-          },
-        );
-      },
+          // final favorites = ref.watch(favoritesProvider);
+          // final isFavorite = favorites.any((p) => p.id == place.id);
+          return PlaceCard(
+            type: 1,
+            place: place,
+            isFavorite: place.isFavorite,
+            onTap: () async {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => PlacePage(id: place.id!)),
+              );
+            },
+            onfav: () async {
+              // ref.read(favoritesProvider.notifier).toggleFavorite(place);
+
+              final msg = place.isFavorite
+                  ? 'تمت إزالة المكان من المفضلة'
+                  : 'تمت إضافة المكان إلى المفضلة';
+              place.isFavorite = !place.isFavorite;
+              setState(() {});
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(SnackBar(content: Text(msg)));
+              await addOrDeletePlaceFromFavorite(
+                  context: context,
+                  id: place.id!,
+                  isFavorite: place.isFavorite);
+            },
+          );
+        },
+      ),
     );
   }
 }

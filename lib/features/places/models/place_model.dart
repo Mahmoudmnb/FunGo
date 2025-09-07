@@ -87,7 +87,7 @@ class Activites {
   String? name;
   String? minPrice;
   String? maxPrice;
-  int? priceAverage;
+  double? priceAverage;
 
   Activites(
       {this.id, this.name, this.minPrice, this.maxPrice, this.priceAverage});
@@ -97,7 +97,7 @@ class Activites {
     name = json['name'];
     minPrice = json['minPrice'];
     maxPrice = json['maxPrice'];
-    priceAverage = json['priceAverage'];
+    priceAverage = json['priceAverage'] + 0.0;
   }
 
   Map<String, dynamic> toJson() {

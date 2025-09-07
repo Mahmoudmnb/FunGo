@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../data/model/offer_model.dart';
-import '../widgets/offer_card.dart';
 import '../pages/offer_details_page.dart';
+import '../widgets/offer_card.dart';
 
 class OffersPage extends StatefulWidget {
   const OffersPage({super.key});
@@ -50,7 +51,7 @@ class _OffersPageState extends State<OffersPage> {
         id: 1,
         name: 'رحلة إلى سوق الحميدية',
         description:
-        'استمتع برحلة مميزة إلى أحد أقدم الأسواق التاريخية في دمشق مع وجبة غداء مجانية.',
+            'استمتع برحلة مميزة إلى أحد أقدم الأسواق التاريخية في دمشق مع وجبة غداء مجانية.',
         imageUrl: 'https://picsum.photos/id/1011/600/400',
         location: 'دمشق',
         originalPrice: 50000,
@@ -64,7 +65,7 @@ class _OffersPageState extends State<OffersPage> {
         id: 2,
         name: 'زيارة قلعة الحصن',
         description:
-        'اكتشف التاريخ العريق في قلعة الحصن مع دليل سياحي متخصص ووجبة عشاء.',
+            'اكتشف التاريخ العريق في قلعة الحصن مع دليل سياحي متخصص ووجبة عشاء.',
         imageUrl: 'https://picsum.photos/id/1012/600/400',
         location: 'حمص',
         originalPrice: 75000,
@@ -78,7 +79,7 @@ class _OffersPageState extends State<OffersPage> {
         id: 3,
         name: 'محمية شرقي دير الزور',
         description:
-        'مغامرة طبيعية في المحمية مع رحلة قارب وتصوير احترافي مجاني.',
+            'مغامرة طبيعية في المحمية مع رحلة قارب وتصوير احترافي مجاني.',
         imageUrl: 'https://picsum.photos/id/1013/600/400',
         location: 'دير الزور',
         originalPrice: 60000,
@@ -91,7 +92,8 @@ class _OffersPageState extends State<OffersPage> {
       OfferModel(
         id: 4,
         name: 'جولة في حلب القديمة',
-        description: 'اكتشف عراقة مدينة حلب مع زيارة القلعة والمساجد التاريخية.',
+        description:
+            'اكتشف عراقة مدينة حلب مع زيارة القلعة والمساجد التاريخية.',
         imageUrl: 'https://picsum.photos/id/1014/600/400',
         location: 'حلب',
         originalPrice: 80000,
@@ -105,7 +107,7 @@ class _OffersPageState extends State<OffersPage> {
         id: 5,
         name: 'شاطئ اللاذقية',
         description:
-        'استمتع بالبحر الأبيض المتوسط مع رحلة صيد وتناول المأكولات البحرية.',
+            'استمتع بالبحر الأبيض المتوسط مع رحلة صيد وتناول المأكولات البحرية.',
         imageUrl: 'https://picsum.photos/id/1015/600/400',
         location: 'اللاذقية',
         originalPrice: 45000,
@@ -183,11 +185,7 @@ class _OffersPageState extends State<OffersPage> {
             ),
             child: Column(
               children: [
-
-
                 const SizedBox(height: 16),
-
-
 
                 const SizedBox(height: 12),
 
@@ -208,10 +206,9 @@ class _OffersPageState extends State<OffersPage> {
                         scrollDirection: Axis.horizontal,
                         child: Row(
                           children: _locations.map((location) {
-                            final isSelected =
-                                _selectedLocation == location ||
-                                    (_selectedLocation == null &&
-                                        location == 'الكل');
+                            final isSelected = _selectedLocation == location ||
+                                (_selectedLocation == null &&
+                                    location == 'الكل');
                             return Padding(
                               padding: const EdgeInsets.only(right: 8),
                               child: FilterChip(
@@ -229,7 +226,7 @@ class _OffersPageState extends State<OffersPage> {
                                 backgroundColor: Colors.white,
                                 onSelected: (_) {
                                   _selectedLocation =
-                                  location == 'الكل' ? null : location;
+                                      location == 'الكل' ? null : location;
                                   _filterOffers();
                                 },
                               ),
@@ -248,62 +245,62 @@ class _OffersPageState extends State<OffersPage> {
           Expanded(
             child: _filteredOffers.isEmpty
                 ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.search_off,
-                    size: 80,
-                    color: Colors.grey.shade400,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'لا توجد عروض متاحة',
-                    style: GoogleFonts.cairo(
-                      fontSize: 18,
-                      color: Colors.grey.shade600,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.search_off,
+                          size: 80,
+                          color: Colors.grey.shade400,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'لا توجد عروض متاحة',
+                          style: GoogleFonts.cairo(
+                            fontSize: 18,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'جرب تغيير معايير البحث',
+                          style: GoogleFonts.cairo(
+                            fontSize: 14,
+                            color: Colors.grey.shade500,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'جرب تغيير معايير البحث',
-                    style: GoogleFonts.cairo(
-                      fontSize: 14,
-                      color: Colors.grey.shade500,
-                    ),
-                  ),
-                ],
-              ),
-            )
+                  )
                 : ListView.builder(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: _filteredOffers.length,
-              itemBuilder: (context, index) {
-                final offer = _filteredOffers[index];
-                final isFavorite = false;
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    itemCount: _filteredOffers.length,
+                    itemBuilder: (context, index) {
+                      final offer = _filteredOffers[index];
+                      const isFavorite = false;
 
-                return OfferCard(
-                  offer: offer,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => OfferDetailsPage(offer: offer),
-                      ),
-                    );
-                  },
-                  onFavorite: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('تم إضافة العرض إلى المفضلة'),
-                        backgroundColor: Colors.teal.shade600,
-                      ),
-                    );
-                  },
-                  isFavorite: isFavorite,
-                );
-              },
-            ),
+                      return OfferCard(
+                        offer: offer,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => OfferDetailsPage(offer: offer),
+                            ),
+                          );
+                        },
+                        onFavorite: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: const Text('تم إضافة العرض إلى المفضلة'),
+                              backgroundColor: Colors.teal.shade600,
+                            ),
+                          );
+                        },
+                        isFavorite: isFavorite,
+                      );
+                    },
+                  ),
           ),
         ],
       ),

@@ -45,7 +45,7 @@ class _PlacePageState extends ConsumerState<PlacePage> {
 
     // final favorites = ref.watch(favoritesProvider);
     // final isFavorite = favorites.any((p) => p.id == place.id);
-    // // final offers = place.offers ?? [];
+    // final offers = place.offers ?? [];
 
     // if (!state.isOnline) {
     //   return const Center(child: Text("❌ لا يوجد اتصال بالإنترنت"));

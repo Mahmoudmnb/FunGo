@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:fun_go_app/features/places/models/place_cart_model.dart';
+
+import '../../features/places/models/place_cart_model.dart';
 
 class PlaceCard extends StatelessWidget {
   final PlaceCartModel place;

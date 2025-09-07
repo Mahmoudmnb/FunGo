@@ -281,89 +281,89 @@ class _TripPageState extends State<TripPage> {
       body: Column(
         children: [
           // Real Google Maps Card
-          Container(
-            margin: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: Container(
-                height: 300,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Stack(
-                  children: [
-                    GoogleMap(
-                      onMapCreated: (GoogleMapController controller) {
-                        _mapController = controller;
-                      },
-                      initialCameraPosition: const CameraPosition(
-                        target: _center,
-                        zoom: 11.0,
-                      ),
-                      markers: _markers,
-                      myLocationEnabled: true,
-                      myLocationButtonEnabled: true,
-                      zoomControlsEnabled: false,
-                      mapToolbarEnabled: false,
-                      mapType: MapType.normal,
-                    ),
-                    // Trip info overlay
-                    if (_selectedPlaces.isNotEmpty)
-                      Positioned(
-                        top: 16,
-                        left: 16,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 6), // Reduced padding
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.9),
-                            borderRadius:
-                                BorderRadius.circular(16), // Reduced from 20
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.location_on,
-                                color: Colors.teal.shade600,
-                                size: 16, // Reduced from 20
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                '${_selectedPlaces.length} أماكن',
-                                style: TextStyle(
-                                  color: Colors.teal.shade800,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12, // Reduced from 14
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+          // Container(
+          //   margin: const EdgeInsets.all(16),
+          //   decoration: BoxDecoration(
+          //     borderRadius: BorderRadius.circular(20),
+          //     boxShadow: [
+          //       BoxShadow(
+          //         color: Colors.black.withOpacity(0.1),
+          //         blurRadius: 10,
+          //         offset: const Offset(0, 5),
+          //       ),
+          //     ],
+          //   ),
+          //   child: ClipRRect(
+          //     borderRadius: BorderRadius.circular(20),
+          //     child: Container(
+          //       height: 300,
+          //       decoration: BoxDecoration(
+          //         color: Colors.white,
+          //         borderRadius: BorderRadius.circular(20),
+          //       ),
+          //       child: Stack(
+          //         children: [
+          //           GoogleMap(
+          //             onMapCreated: (GoogleMapController controller) {
+          //               _mapController = controller;
+          //             },
+          //             initialCameraPosition: const CameraPosition(
+          //               target: _center,
+          //               zoom: 11.0,
+          //             ),
+          //             markers: _markers,
+          //             myLocationEnabled: true,
+          //             myLocationButtonEnabled: true,
+          //             zoomControlsEnabled: false,
+          //             mapToolbarEnabled: false,
+          //             mapType: MapType.normal,
+          //           ),
+          //           // Trip info overlay
+          //           if (_selectedPlaces.isNotEmpty)
+          //             Positioned(
+          //               top: 16,
+          //               left: 16,
+          //               child: Container(
+          //                 padding: const EdgeInsets.symmetric(
+          //                     horizontal: 10, vertical: 6), // Reduced padding
+          //                 decoration: BoxDecoration(
+          //                   color: Colors.white.withOpacity(0.9),
+          //                   borderRadius:
+          //                       BorderRadius.circular(16), // Reduced from 20
+          //                   boxShadow: [
+          //                     BoxShadow(
+          //                       color: Colors.black.withOpacity(0.1),
+          //                       blurRadius: 4,
+          //                       offset: const Offset(0, 2),
+          //                     ),
+          //                   ],
+          //                 ),
+          //                 child: Row(
+          //                   mainAxisSize: MainAxisSize.min,
+          //                   children: [
+          //                     Icon(
+          //                       Icons.location_on,
+          //                       color: Colors.teal.shade600,
+          //                       size: 16, // Reduced from 20
+          //                     ),
+          //                     const SizedBox(width: 4),
+          //                     Text(
+          //                       '${_selectedPlaces.length} أماكن',
+          //                       style: TextStyle(
+          //                         color: Colors.teal.shade800,
+          //                         fontWeight: FontWeight.bold,
+          //                         fontSize: 12, // Reduced from 14
+          //                       ),
+          //                     ),
+          //                   ],
+          //                 ),
+          //               ),
+          //             ),
+          //         ],
+          //       ),
+          //     ),
+          //   ),
+          // ),
 
           // Selected Locations Section
           Expanded(
