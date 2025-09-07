@@ -52,7 +52,12 @@ class FavoritesPage extends ConsumerWidget {
               addOrDeletePlaceFromFavorite(
                   context: context, id: place.id!, isFavorite: false);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('تمت إزالة المكان من المفضلة')),
+                const SnackBar(
+                  backgroundColor: Colors.teal,
+                  content: Text(
+                    'تمت إزالة المكان من المفضلة',
+                  ),
+                ),
               );
             },
           );

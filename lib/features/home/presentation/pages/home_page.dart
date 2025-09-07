@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants.dart';
 import '../../../../shared/widgets/place_card.dart';
+import '../../../auth/methods/auth_methods.dart';
 import '../../../favorites/methods/favorite_method.dart';
 import '../../../favorites/presentation/pages/favorites_page.dart';
 import '../../../offers/presentation/pages/offers_page.dart';
@@ -196,41 +197,42 @@ class _HomePageState extends ConsumerState<HomePage> {
               ? Padding(
                   padding: const EdgeInsets.only(right: 12),
                   child: FilterIconButton(onPressed: () async {
-                    await showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      useSafeArea: true,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(24)),
-                      ),
-                      builder: (_) => FilterBottomSheet(
-                        cheapest: cheapest,
-                        location: location,
-                        offers: offers,
-                        rating: rating,
-                        onFilter: (c, r, o, l, long, lat) async {
-                          cheapest = c;
-                          rating = r;
-                          offers = o;
-                          location = l;
-                          longitude = long;
-                          latitude = lat;
-                          if (context.mounted) {
-                            getPlacesMethod = getPlacesWithFilter(
-                                context: context,
-                                filter: getFilterText(
-                                    cheapest: cheapest,
-                                    rating: rating,
-                                    offers: offers,
-                                    cityName: selectedPlace,
-                                    latitude: latitude,
-                                    longitude: longitude));
-                            setState(() {});
-                          }
-                        },
-                      ),
-                    );
+                    getToken();
+                    // await showModalBottomSheet(
+                    //   context: context,
+                    //   isScrollControlled: true,
+                    //   useSafeArea: true,
+                    //   shape: const RoundedRectangleBorder(
+                    //     borderRadius:
+                    //         BorderRadius.vertical(top: Radius.circular(24)),
+                    //   ),
+                    //   builder: (_) => FilterBottomSheet(
+                    //     cheapest: cheapest,
+                    //     location: location,
+                    //     offers: offers,
+                    //     rating: rating,
+                    //     onFilter: (c, r, o, l, long, lat) async {
+                    //       cheapest = c;
+                    //       rating = r;
+                    //       offers = o;
+                    //       location = l;
+                    //       longitude = long;
+                    //       latitude = lat;
+                    //       if (context.mounted) {
+                    //         getPlacesMethod = getPlacesWithFilter(
+                    //             context: context,
+                    //             filter: getFilterText(
+                    //                 cheapest: cheapest,
+                    //                 rating: rating,
+                    //                 offers: offers,
+                    //                 cityName: selectedPlace,
+                    //                 latitude: latitude,
+                    //                 longitude: longitude));
+                    //         setState(() {});
+                    //       }
+                    //     },
+                    //   ),
+                    // );
                     // بعد الإغلاق: الفلترة تتحدث تلقائياً
                   }),
                 )
@@ -278,8 +280,14 @@ class _HomePageState extends ConsumerState<HomePage> {
           if (_pageIndex == 0) ...[
             const SizedBox(height: 12),
             _buildProvinceFilter(context, (String text) {
-              getPlacesMethod =
-                  getPlacesWithFilter(context: context, filter: text);
+              selectedPlace = text;
+              getPlacesMethod = getPlacesWithFilter(
+                  context: context,
+                  filter: getFilterText(
+                      cheapest: cheapest,
+                      rating: rating,
+                      offers: offers,
+                      cityName: text));
               setState(() {});
             }),
             pages[_pageIndex]
@@ -388,8 +396,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                     : 'تمت إضافة المكان إلى المفضلة';
                 place.isFavorite = !place.isFavorite;
                 setState(() {});
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text(msg)));
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text(msg),
+                  backgroundColor: Colors.teal,
+                ));
                 await addOrDeletePlaceFromFavorite(
                     context: context,
                     id: place.id!,

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "563912762714",
+    "project_id": "fungo-app-c9239",
+    "storage_bucket": "fungo-app-c9239.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:563912762714:android:057d81106f4e16433c3f63",
+        "android_client_info": {
+          "package_name": "com.example.fun_go_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCH2XId9_qUX12j-le4BKEaceQe39v907Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
