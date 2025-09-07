@@ -1,5 +1,3 @@
-import '../../data/model/place_model.dart';
-
 class PlaceState {
   final bool isOnline;
   final double rating;

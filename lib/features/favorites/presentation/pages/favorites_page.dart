@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../shared/widgets/place_card.dart';
-import '../../../places/presentation/pages/place_page.dart';
+
 import '../providers/favorites_provider.dart';
 
 class FavoritesPage extends ConsumerWidget {
@@ -27,23 +26,24 @@ class FavoritesPage extends ConsumerWidget {
         final place = favorites[index];
 
         final isFavorite = favorites.any((p) => p.id == place.id);
-        return PlaceCard(
-          place: place,
-          type: 2,
-          isFavorite: isFavorite,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => PlacePage(place: place)),
-            );
-          },
-          onfav: () {
-            ref.read(favoritesProvider.notifier).removeFavorite(place);
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('تمت إزالة المكان من المفضلة')),
-            );
-          },
-        );
+        return null;
+        // return PlaceCard(
+        //   place: place,
+        //   type: 2,
+        //   isFavorite: isFavorite,
+        //   onTap: () {
+        //     Navigator.push(
+        //       context,
+        //       MaterialPageRoute(builder: (_) => PlacePage(place: place)),
+        //     );
+        //   },
+        //   onfav: () {
+        //     ref.read(favoritesProvider.notifier).removeFavorite(place);
+        //     ScaffoldMessenger.of(context).showSnackBar(
+        //       const SnackBar(content: Text('تمت إزالة المكان من المفضلة')),
+        //     );
+        //   },
+        // );
         /*
         final place = favorites[index];
         return Directionality(

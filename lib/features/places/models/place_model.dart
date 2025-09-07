@@ -7,9 +7,11 @@ class PlaceModel {
   List<Activites>? activites;
   double? reviewAvarge;
   List<Stories>? stories;
+  bool isFavorite = false;
 
   PlaceModel(
       {this.id,
+      this.isFavorite = false,
       this.name,
       this.address,
       this.description,
@@ -35,7 +37,7 @@ class PlaceModel {
         activites!.add(Activites.fromJson(v));
       });
     }
-    reviewAvarge = json['reviewAvarge'];
+    reviewAvarge = json['reviewAvarge'] + 0.0;
     if (json['stories'] != null) {
       stories = <Stories>[];
       json['stories'].forEach((v) {

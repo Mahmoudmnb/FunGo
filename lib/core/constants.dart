@@ -18,10 +18,9 @@ class Constants {
   static const logout = '$_domain/api/users/logout';
 
   //* places end points
-  static const showPlaces = '$_domain/api/places';
+  static const showPlace = '$_domain/api/places';
   static const searchPlaces = '$_domain/api/places/index?search=';
-  static const filterPlaces =
-      '$_domain/api/places/index?filters[]=cheapest&filters[]=offers&filters[]=rating&filters[]=nearest&activity_type_id=1&governorate=';
+  static const filterPlaces = '$_domain/api/places/index';
 
   //* trip end points
   static const addTrip = '$_domain/api/trips/add-trip';
@@ -46,7 +45,7 @@ class Constants {
 
   //* sales end points
   static const getSalesPlace = '$_domain/api/sale';
-  static const getAllSales = '$_domain/api/sale/index';
+  static const getAllSales = '$_domain/api/places/22/show';
 
   //* activityTypes end points
   static const getAllActivityTypes = '$_domain/api/activity-type';

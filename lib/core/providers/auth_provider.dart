@@ -1,5 +1,9 @@
 // lib/core/providers/auth_provider.dart
+import 'dart:convert';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fun_go_app/core/constants.dart';
+import 'package:fun_go_app/features/auth/models/user.dart';
 import 'package:fun_go_app/injection.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -9,6 +13,7 @@ final authProvider = StateProvider<AuthStatus>((ref) {
   SharedPreferences sh = sl.get<SharedPreferences>();
   String? user = sh.getString('user');
   if (user != null) {
+    Constants.user = User.fromMap(jsonDecode(user));
     return AuthStatus.authenticated;
   }
   return AuthStatus.unauthenticated;

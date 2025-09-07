@@ -1,10 +1,10 @@
 // lib/features/home/providers/home_providers.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../places/data/model/place_model.dart';
-import '../pages/home_page.dart';
 
 // Static provider (البيانات الثابتة عندك أو لاحقاً جايه من API)
-final placesProvider = Provider<List<PlaceModel>>((ref) {
+final placesProvider = Provider<List<PlaceModelTemp>>((ref) {
   // حافظت على مكان تعريفك الأصلي للـ sample data
   // افترضت أنه عندك نفس الـ list كما في HomePage القديم
   // لو جبتيها من API استبدليها بAsyncProvider لاحقاً.
@@ -12,18 +12,19 @@ final placesProvider = Provider<List<PlaceModel>>((ref) {
 });
 
 // هذا provider افتراضي يعيد نفس البيانات لو ما تيجي من API
-final homePlacesStaticProvider = Provider<List<PlaceModel>>((ref) {
+final homePlacesStaticProvider = Provider<List<PlaceModelTemp>>((ref) {
   // إذا عندك ملف ثابت تعيديه هنا، أو انسخي بياناتك هنا مؤقتاً.
   return [];
 });
 
 /// فلتر/فرز مركب: يعتمد على كل حالات الفلاتر المتاحة
-final filteredPlacesProvider = Provider<List<PlaceModel>>((ref) {
+final filteredPlacesProvider = Provider<List<PlaceModelTemp>>((ref) {
   final all = ref.watch(placesProvider);
   final selectedProvince = ref.watch(selectedProvinceProvider);
   final query = ref.watch(searchQueryProvider).trim();
   final minRating = ref.watch(selectedRatingProvider);
-  final maxBudget = ref.watch(selectedBudgetProvider); // المستخدم يختار قيمة للميزانية => نعرض الأماكن أقل أو يساوي
+  final maxBudget = ref.watch(
+      selectedBudgetProvider); // المستخدم يختار قيمة للميزانية => نعرض الأماكن أقل أو يساوي
   final selectedActivity = ref.watch(selectedActivityProvider);
 
   // فلترة مبدئية
@@ -31,23 +32,26 @@ final filteredPlacesProvider = Provider<List<PlaceModel>>((ref) {
     // فلترة بالمحافظة: نتحقق إن حقل location يحتوي اسم المحافظة (أكثر مرونة)
     final matchesProvince = selectedProvince == null
         ? true
-        : (p.location?.toLowerCase().contains(selectedProvince.toLowerCase()) ?? false)
-        || (p.province != null && p.province!.toLowerCase() == selectedProvince.toLowerCase());
+        : (p.location.toLowerCase().contains(selectedProvince.toLowerCase()) ??
+                false) ||
+            (p.province != null &&
+                p.province!.toLowerCase() == selectedProvince.toLowerCase());
 
     // فلترة البحث: بالاسم أو الوصف
     final matchesQuery = query.isEmpty
         ? true
-        : (p.name?.toLowerCase().contains(query.toLowerCase()) ?? false) ||
-        (p.description?.toLowerCase().contains(query.toLowerCase()) ?? false);
+        : (p.name.toLowerCase().contains(query.toLowerCase()) ?? false) ||
+            (p.description.toLowerCase().contains(query.toLowerCase()) ??
+                false);
 
     // فلترة النشاط (إذا اختار المستخدم نشاط)
     final matchesActivity = selectedActivity == null
         ? true
-        : (p.activities?.any((a) {
-      final name = (a['name'] ?? '').toString().toLowerCase();
-      return name.contains(selectedActivity.toLowerCase());
-    }) ??
-        false);
+        : (p.activities.any((a) {
+              final name = (a['name'] ?? '').toString().toLowerCase();
+              return name.contains(selectedActivity.toLowerCase());
+            }) ??
+            false);
 
     // فلترة التقييم: اذا المكان فيه خاصية rating واذا المستخدم حدد حد أدنى
     final matchesRating = minRating == null
@@ -56,9 +60,15 @@ final filteredPlacesProvider = Provider<List<PlaceModel>>((ref) {
 
     // فلترة الميزانية: هنا نحسب أقل تكلفة لنشاط داخل المكان (إذا وجدت)
     final placeMinCost = _minCostOfPlace(p);
-    final matchesBudget = maxBudget == null ? true : (placeMinCost != null ? placeMinCost <= maxBudget : false);
+    final matchesBudget = maxBudget == null
+        ? true
+        : (placeMinCost != null ? placeMinCost <= maxBudget : false);
 
-    return matchesProvince && matchesQuery && matchesActivity && matchesRating && matchesBudget;
+    return matchesProvince &&
+        matchesQuery &&
+        matchesActivity &&
+        matchesRating &&
+        matchesBudget;
   }).toList();
 
   // الآن نطبّق الفرز:
@@ -88,24 +98,25 @@ final filteredPlacesProvider = Provider<List<PlaceModel>>((ref) {
   return list;
 });
 
-double? _minCostOfPlace(PlaceModel p) {
+double? _minCostOfPlace(PlaceModelTemp p) {
   try {
-    if (p.activities == null || p.activities!.isEmpty) return null;
-    final costs = p.activities!
-        .map((a) {
-      final c = a['cost'];
-      if (c == null) return null;
-      if (c is num) return c.toDouble();
-      final parsed = double.tryParse(c.toString());
-      return parsed;
-    })
-        .whereType<double>()
-        .toList();
-    if (costs.isEmpty) return null;
-    return costs.reduce((v, e) => v < e ? v : e);
+    // if (p.activities == null || p.activities!.isEmpty) return null;
+    // final costs = p.activities!
+    //     .map((a) {
+    //   final c = a['cost'];
+    //   if (c == null) return null;
+    //   if (c is num) return c.toDouble();
+    //   final parsed = double.tryParse(c.toString());
+    //   return parsed;
+    // })
+    //     .whereType<double>()
+    //     .toList();
+    // if (costs.isEmpty) return null;
+    // return costs.reduce((v, e) => v < e ? v : e);
   } catch (e) {
     return null;
   }
+  return null;
 }
 
 // الاحتفاظ ببعض providers اللي عندك:

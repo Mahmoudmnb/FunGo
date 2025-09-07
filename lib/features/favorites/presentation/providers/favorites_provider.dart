@@ -2,21 +2,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../places/data/model/place_model.dart';
 
-
-class FavoritesNotifier extends StateNotifier<List<PlaceModel>> {
+class FavoritesNotifier extends StateNotifier<List<PlaceModelTemp>> {
   FavoritesNotifier() : super([]);
 
-  void addFavorite(PlaceModel place) {
+  void addFavorite(PlaceModelTemp place) {
     if (!state.any((p) => p.id == place.id)) {
       state = [...state, place];
     }
   }
 
-  void removeFavorite(PlaceModel place) {
+  void removeFavorite(PlaceModelTemp place) {
     state = state.where((p) => p.id != place.id).toList();
   }
 
-  void toggleFavorite(PlaceModel place) {
+  void toggleFavorite(PlaceModelTemp place) {
     if (state.any((p) => p.id == place.id)) {
       removeFavorite(place);
     } else {
@@ -24,9 +23,10 @@ class FavoritesNotifier extends StateNotifier<List<PlaceModel>> {
     }
   }
 
-  bool isFavorite(PlaceModel place) => state.any((p) => p.id == place.id);
+  bool isFavorite(PlaceModelTemp place) => state.any((p) => p.id == place.id);
 }
 
-final favoritesProvider = StateNotifierProvider<FavoritesNotifier, List<PlaceModel>>(
-      (ref) => FavoritesNotifier(),
+final favoritesProvider =
+    StateNotifierProvider<FavoritesNotifier, List<PlaceModelTemp>>(
+  (ref) => FavoritesNotifier(),
 );

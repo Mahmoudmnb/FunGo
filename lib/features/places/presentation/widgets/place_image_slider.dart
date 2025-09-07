@@ -1,8 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 
-class PlaceImageSlider extends StatelessWidget {
-  final List<String> imageUrls;
+import '../../models/place_model.dart';
+
+class PlaceImageSlider extends StatefulWidget {
+  final List<Images> imageUrls;
   final PageController controller;
   final int currentPage;
   final void Function(int) onPageChanged;
@@ -16,35 +18,56 @@ class PlaceImageSlider extends StatelessWidget {
   });
 
   @override
+  State<PlaceImageSlider> createState() => _PlaceImageSliderState();
+}
+
+class _PlaceImageSliderState extends State<PlaceImageSlider> {
+  int currentPage = 0;
+  @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         SizedBox(
           height: 320,
           child: PageView.builder(
-            itemCount: imageUrls.length,
-            controller: controller,
-            onPageChanged: onPageChanged,
+            itemCount: widget.imageUrls.length,
+            controller: widget.controller,
+            onPageChanged: (value) {
+              currentPage = value;
+              setState(() {});
+              widget.onPageChanged(value);
+            },
             itemBuilder: (context, index) {
-              final src = imageUrls[index];
-              final isNetwork = src.startsWith('http');
+              final Images src = widget.imageUrls[index];
+              final isNetwork = src.original!.startsWith('http');
               return isNetwork
                   ? CachedNetworkImage(
-                      imageUrl: src,
+                      imageUrl: src.original!,
                       fit: BoxFit.cover,
                       width: double.infinity,
                       placeholder: (_, __) =>
                           const Center(child: CircularProgressIndicator()),
-                      errorWidget: (_, __, ___) =>
-                          Image.asset('assets/images/placeholder.png'),
-                    )
-                  : Image.asset(
-                      src,
+                      errorWidget: (_, __, ___) => const Center(
+                            child: Text(
+                              'خطأ في الصورة',
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 40),
+                            ),
+                          )
+                      // Image.asset('assets/images/placeholder.png'),
+                      )
+                  : Image.asset(src.original!,
                       fit: BoxFit.cover,
                       width: double.infinity,
                       errorBuilder: (_, __, ___) =>
-                          Image.asset('assets/images/placeholder.png'),
-                    );
+                          // Image.asset('assets/images/placeholder.png'),
+                          const Center(
+                            child: Text(
+                              'خطأ في الصورة',
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 40),
+                            ),
+                          ));
             },
           ),
         ),
@@ -55,16 +78,14 @@ class PlaceImageSlider extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(
-              imageUrls.length,
+              widget.imageUrls.length,
               (index) => AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 margin: const EdgeInsets.symmetric(horizontal: 4),
                 height: 8,
                 width: currentPage == index ? 24 : 8,
                 decoration: BoxDecoration(
-                  color: currentPage == index
-                      ? Colors.white
-                      : Colors.white54,
+                  color: currentPage == index ? Colors.white : Colors.white54,
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),

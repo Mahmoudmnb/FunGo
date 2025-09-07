@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 import '../../data/services/trip_service.dart';
 import '../../presentation/place.dart';
 
@@ -15,7 +16,7 @@ class _TripPageState extends State<TripPage> {
   final Set<Marker> _markers = {};
   final List<Place> _selectedPlaces = [];
   final TripService _tripService = TripService();
-  
+
   // Map center coordinates (Dubai)
 // Map center coordinates (Damascus, Syria)
   static const LatLng _center = LatLng(33.5138, 36.2765);
@@ -23,7 +24,7 @@ class _TripPageState extends State<TripPage> {
   @override
   void initState() {
     super.initState();
-    _initializeTrip();
+    // _initializeTrip();
   }
 
   void _initializeTrip() {
@@ -70,7 +71,8 @@ class _TripPageState extends State<TripPage> {
   }
 
   void _removeMarker(Place place) {
-    _markers.removeWhere((marker) => marker.markerId.value == place.id.toString());
+    _markers
+        .removeWhere((marker) => marker.markerId.value == place.id.toString());
   }
 
   void _showAddPlaceDialog() {
@@ -94,7 +96,7 @@ class _TripPageState extends State<TripPage> {
               itemBuilder: (context, index) {
                 final place = _tripService.availablePlaces[index];
                 final isSelected = _selectedPlaces.any((p) => p.id == place.id);
-                
+
                 return ListTile(
                   leading: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
@@ -107,17 +109,21 @@ class _TripPageState extends State<TripPage> {
                         width: 45,
                         height: 45,
                         color: Colors.grey.shade300,
-                        child: Icon(Icons.place, color: Colors.grey.shade600, size: 20), // Reduced icon size
+                        child: Icon(Icons.place,
+                            color: Colors.grey.shade600,
+                            size: 20), // Reduced icon size
                       ),
                     ),
                   ),
                   title: Text(
                     place.name,
-                    style: const TextStyle(fontSize: 14), // Reduced from default
+                    style:
+                        const TextStyle(fontSize: 14), // Reduced from default
                   ),
                   subtitle: Text(
                     place.location,
-                    style: const TextStyle(fontSize: 12), // Reduced from default
+                    style:
+                        const TextStyle(fontSize: 12), // Reduced from default
                   ),
                   trailing: Icon(
                     isSelected ? Icons.check_circle : Icons.add_circle_outline,
@@ -163,7 +169,8 @@ class _TripPageState extends State<TripPage> {
           ),
           title: Row(
             children: [
-              Icon(Icons.celebration, color: Colors.amber.shade600, size: 24), // Reduced from 28
+              Icon(Icons.celebration,
+                  color: Colors.amber.shade600, size: 24), // Reduced from 28
               const SizedBox(width: 8),
               Text(
                 'تهانينا! 🎉',
@@ -187,7 +194,9 @@ class _TripPageState extends State<TripPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.location_on, color: Colors.teal.shade600, size: 18), // Reduced from default
+                    Icon(Icons.location_on,
+                        color: Colors.teal.shade600,
+                        size: 18), // Reduced from default
                     const SizedBox(width: 8),
                     Text(
                       'لقد زرت ${_selectedPlaces.length} أماكن في رحلتك!',
@@ -212,7 +221,7 @@ class _TripPageState extends State<TripPage> {
             ],
           ),
           actions: [
-            Container(
+            SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () => Navigator.of(context).pop(),
@@ -226,7 +235,9 @@ class _TripPageState extends State<TripPage> {
                 ),
                 child: const Text(
                   'رائع!',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold), // Reduced from 16
+                  style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold), // Reduced from 16
                 ),
               ),
             ),
@@ -243,7 +254,9 @@ class _TripPageState extends State<TripPage> {
       appBar: AppBar(
         title: const Text(
           'رحلتي',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18), // Reduced from default
+          style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18), // Reduced from default
         ),
         backgroundColor: Colors.teal.shade700,
         elevation: 0,
@@ -311,10 +324,12 @@ class _TripPageState extends State<TripPage> {
                         top: 16,
                         left: 16,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6), // Reduced padding
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 6), // Reduced padding
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.9),
-                            borderRadius: BorderRadius.circular(16), // Reduced from 20
+                            borderRadius:
+                                BorderRadius.circular(16), // Reduced from 20
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withOpacity(0.1),
@@ -370,25 +385,29 @@ class _TripPageState extends State<TripPage> {
                       ),
                       ElevatedButton.icon(
                         onPressed: _showAddPlaceDialog,
-                        icon: const Icon(Icons.add_location, size: 18), // Reduced icon size
+                        icon: const Icon(Icons.add_location,
+                            size: 18), // Reduced icon size
                         label: const Text(
                           'إضافة مكان',
-                          style: TextStyle(fontSize: 12), // Reduced from default
+                          style:
+                              TextStyle(fontSize: 12), // Reduced from default
                         ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.teal.shade600,
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20), // Reduced from 25
+                            borderRadius:
+                                BorderRadius.circular(20), // Reduced from 25
                           ),
                           elevation: 3,
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Reduced padding
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8), // Reduced padding
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 12), // Reduced from 16
-                  
+
                   if (_selectedPlaces.isEmpty)
                     Expanded(
                       child: Center(
@@ -396,7 +415,8 @@ class _TripPageState extends State<TripPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(16), // Reduced from 20
+                              padding:
+                                  const EdgeInsets.all(16), // Reduced from 20
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 shape: BoxShape.circle,
@@ -443,10 +463,12 @@ class _TripPageState extends State<TripPage> {
                         itemBuilder: (context, index) {
                           final place = _selectedPlaces[index];
                           return Container(
-                            margin: const EdgeInsets.only(bottom: 10), // Reduced from 12
+                            margin: const EdgeInsets.only(
+                                bottom: 10), // Reduced from 12
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(14), // Reduced from 16
+                              borderRadius:
+                                  BorderRadius.circular(14), // Reduced from 16
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.black.withOpacity(0.05),
@@ -456,9 +478,11 @@ class _TripPageState extends State<TripPage> {
                               ],
                             ),
                             child: ListTile(
-                              contentPadding: const EdgeInsets.all(12), // Reduced from 16
+                              contentPadding:
+                                  const EdgeInsets.all(12), // Reduced from 16
                               leading: ClipRRect(
-                                borderRadius: BorderRadius.circular(10), // Reduced from 12
+                                borderRadius: BorderRadius.circular(
+                                    10), // Reduced from 12
                                 child: Image.network(
                                   place.imageUrl,
                                   width: 60, // Reduced from 70
@@ -498,7 +522,8 @@ class _TripPageState extends State<TripPage> {
                                 ),
                                 onPressed: () => _removePlaceFromTrip(place),
                                 tooltip: 'حذف من الرحلة',
-                                padding: const EdgeInsets.all(4), // Reduced padding
+                                padding:
+                                    const EdgeInsets.all(4), // Reduced padding
                                 constraints: const BoxConstraints(
                                   minWidth: 32,
                                   minHeight: 32,
@@ -519,25 +544,27 @@ class _TripPageState extends State<TripPage> {
             width: double.infinity,
             margin: const EdgeInsets.all(16),
             child: ElevatedButton(
-              onPressed: _selectedPlaces.isNotEmpty ? _showTripCompletionDialog : null,
+              onPressed:
+                  _selectedPlaces.isNotEmpty ? _showTripCompletionDialog : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.teal.shade600,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14), // Reduced from 16
+                padding:
+                    const EdgeInsets.symmetric(vertical: 14), // Reduced from 16
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(22), // Reduced from 25
                 ),
                 elevation: 5,
                 shadowColor: Colors.teal.withOpacity(0.3),
               ),
-              child: Row(
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
                     Icons.check_circle_outline,
                     size: 20, // Reduced from 24
                   ),
-                  const SizedBox(width: 6), // Reduced from 8
+                  SizedBox(width: 6), // Reduced from 8
                   Text(
                     'جميع الأماكن تمت زيارتها',
                     style: TextStyle(

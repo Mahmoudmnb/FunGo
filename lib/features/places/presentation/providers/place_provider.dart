@@ -1,6 +1,8 @@
 import 'dart:async';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'place_state.dart';
 
 class PlaceNotifier extends StateNotifier<PlaceState> {
@@ -47,7 +49,6 @@ class PlaceNotifier extends StateNotifier<PlaceState> {
   }
 }
 
-final placeProvider =
-StateNotifierProvider<PlaceNotifier, PlaceState>((ref) {
+final placeProvider = StateNotifierProvider<PlaceNotifier, PlaceState>((ref) {
   return PlaceNotifier(Connectivity());
 });

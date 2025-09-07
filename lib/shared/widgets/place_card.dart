@@ -1,10 +1,9 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import '../../features/places/data/model/place_model.dart';
+import 'package:fun_go_app/features/places/models/place_cart_model.dart';
 
 class PlaceCard extends StatelessWidget {
-  final PlaceModel place;
+  final PlaceCartModel place;
   final VoidCallback onTap;
   final VoidCallback onfav;
   final bool isFavorite;
@@ -27,7 +26,7 @@ class PlaceCard extends StatelessWidget {
         elevation: 4,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
-          side: BorderSide(width: 0.8, color: Colors.teal),
+          side: const BorderSide(width: 0.8, color: Colors.teal),
         ),
         margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
         child: InkWell(
@@ -42,18 +41,17 @@ class PlaceCard extends StatelessWidget {
                     borderRadius: const BorderRadius.horizontal(
                       right: Radius.circular(10),
                     ),
-                    child: Image.asset(
-                      place.imageUrls[0],
+                    child: Image.network(
+                      place.image!,
                       width: 120,
                       height: 100,
                       fit: BoxFit.cover,
-                      errorBuilder:
-                          (_, __, ___) => Image.asset(
-                            'assets/images/Place1_1.jpg',
-                            width: 120,
-                            height: 100,
-                            fit: BoxFit.cover,
-                          ),
+                      errorBuilder: (_, __, ___) => Image.asset(
+                        'assets/images/Place1_1.jpg',
+                        width: 120,
+                        height: 100,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -85,7 +83,7 @@ class PlaceCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          place.name,
+                          place.name ?? '',
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -94,14 +92,14 @@ class PlaceCard extends StatelessWidget {
                         const SizedBox(height: 4),
                         Row(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.location_on,
                               size: 18,
                               color: Colors.teal,
                             ),
                             Expanded(
                               child: Text(
-                                "${place.location}",
+                                place.address ?? '',
                                 style: TextStyle(
                                   color: Colors.grey.shade700,
                                   fontSize: 12,
@@ -193,7 +191,6 @@ class PlaceCard extends StatelessWidget {
                   ),
                 ],
               ),
-
               Positioned(
                 left: 0,
                 top: 0,
@@ -202,38 +199,33 @@ class PlaceCard extends StatelessWidget {
                   height: 35,
                   decoration: BoxDecoration(
                     color: Colors.teal.shade200,
-                    borderRadius: BorderRadius.only(
+                    borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(10),
                       bottomRight: Radius.circular(10),
                     ),
                   ),
-                  child:
-                      type == 1
-                          ? IconButton(
-                            icon: Icon(
-                              isFavorite
-                                  ? Icons.favorite
-                                  : Icons.favorite_border,
-                              color:
-                                  isFavorite ? Colors.redAccent : Colors.white,
-                            ),
-                            focusColor: Colors.green,
-                            onPressed: onfav,
-                            tooltip:
-                                isFavorite
-                                    ? 'إزالة من المفضلة'
-                                    : 'إضافة إلى المفضلة',
-                            iconSize: 20,
-                          )
-                          : IconButton(
-                            icon: const Icon(
-                              Icons.delete,
-                              color: Colors.redAccent,
-                            ),
-                            onPressed: onfav,
-                            tooltip: 'حذف من المفضلة',
-                            iconSize: 20,
+                  child: type == 1
+                      ? IconButton(
+                          icon: Icon(
+                            isFavorite ? Icons.favorite : Icons.favorite_border,
+                            color: isFavorite ? Colors.redAccent : Colors.white,
                           ),
+                          focusColor: Colors.green,
+                          onPressed: onfav,
+                          tooltip: isFavorite
+                              ? 'إزالة من المفضلة'
+                              : 'إضافة إلى المفضلة',
+                          iconSize: 20,
+                        )
+                      : IconButton(
+                          icon: const Icon(
+                            Icons.delete,
+                            color: Colors.redAccent,
+                          ),
+                          onPressed: onfav,
+                          tooltip: 'حذف من المفضلة',
+                          iconSize: 20,
+                        ),
                 ),
               ),
             ],

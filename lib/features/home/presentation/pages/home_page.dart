@@ -1,20 +1,20 @@
-import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../favorites/presentation/providers/favorites_provider.dart';
-import '../../../places/data/model/place_model.dart';
-
 import '../../../../shared/widgets/place_card.dart';
-import '../../../places/presentation/pages/place_page.dart';
+import '../../../favorites/methods/favorite_method.dart';
 import '../../../favorites/presentation/pages/favorites_page.dart';
-import '../../../places/presentation/widgets/logo_widget.dart';
-import '../providers/home_providers.dart';
-import '../widgets/filter_sheet.dart';
-
+import '../../../favorites/presentation/providers/favorites_provider.dart';
 // ✅ إضافات جديدة
 import '../../../offers/presentation/pages/offers_page.dart';
+import '../../../places/models/place_cart_model.dart';
+import '../../../places/presentation/pages/place_page.dart';
+import '../../../places/presentation/widgets/logo_widget.dart';
 import '../../../trip/presentation/pages/trip_page.dart';
+import '../../methods/place_methods.dart';
+import '../providers/home_providers.dart';
+import '../widgets/filter_sheet.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -24,6 +24,16 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
+  late Future<List<PlaceCartModel>?> getPlacesMethod;
+  late Future<List?> getFavoriteMethod;
+
+  @override
+  void initState() {
+    getPlacesMethod = getPlacesWithFilter(context: context, cityFilter: '');
+    getFavoriteMethod = getFavorites(context: context);
+    super.initState();
+  }
+
   int _pageIndex = 0;
 
   final List<String> _provinces = const [
@@ -46,8 +56,9 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final filteredPlaces = ref.watch(filteredPlacesProvider);
-    final favorites = ref.watch(favoritesProvider);
+    // final filteredPlaces = ref.watch(filteredPlacesProvider);
+
+    // final favorites = ref.watch(favoritesProvider);
 
     // ✅ أيقونات البوتوم ناف
     final navItems = <Widget>[
@@ -59,8 +70,47 @@ class _HomePageState extends ConsumerState<HomePage> {
 
     // ✅ الصفحات المرتبطة
     final pages = [
-      _buildPlacesList(filteredPlaces),
-      const FavoritesPage(),
+      FutureBuilder(
+        future: getPlacesMethod,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Expanded(
+                child: Center(child: CircularProgressIndicator()));
+          } else if (snapshot.hasData) {
+            return _buildPlacesList(snapshot.data!);
+          } else {
+            return IconButton(
+                onPressed: () {
+                  getPlacesMethod =
+                      getPlacesWithFilter(context: context, cityFilter: '');
+                  setState(() {});
+                },
+                icon: const Icon(Icons.replay_outlined));
+          }
+        },
+      ),
+      FutureBuilder(
+        future: getFavoriteMethod,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasData) {
+            return const FavoritesPage();
+          } else {
+            return Center(
+              child: IconButton(
+                  onPressed: () {
+                    getFavoriteMethod = getFavorites(context: context);
+                    setState(() {});
+                  },
+                  icon: const Icon(
+                    Icons.replay_outlined,
+                    size: 30,
+                  )),
+            );
+          }
+        },
+      ),
       const OffersPage(),
       const TripPage(),
     ];
@@ -68,7 +118,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: LogoWidget(),
+        title: const LogoWidget(),
         backgroundColor: Colors.grey[100],
         centerTitle: true,
         actions: [
@@ -82,7 +132,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
                 ),
-                builder: (_) => FilterBottomSheet(),
+                builder: (_) => const FilterBottomSheet(),
               );
               // بعد الإغلاق: الفلترة تتحدث تلقائياً
             }),
@@ -113,7 +163,11 @@ class _HomePageState extends ConsumerState<HomePage> {
         children: [
           if (_pageIndex == 0) ...[
             const SizedBox(height: 12),
-            _buildProvinceFilter(context),
+            _buildProvinceFilter(context, (String text) {
+              getPlacesMethod =
+                  getPlacesWithFilter(context: context, cityFilter: text);
+              setState(() {});
+            }),
             Expanded(child: pages[_pageIndex]),
           ] else ...[
             Expanded(child: pages[_pageIndex]),
@@ -123,7 +177,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
-  Widget _buildProvinceFilter(BuildContext context) {
+  Widget _buildProvinceFilter(BuildContext context, Function(String) onTap) {
     final selectedProvince = ref.watch(selectedProvinceProvider);
     return Container(
       height: 50,
@@ -147,6 +201,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                       : Colors.teal.shade900,
                 ),
                 onSelected: (_) {
+                  onTap('');
                   ref.read(selectedProvinceProvider.notifier).state = null;
                 },
               );
@@ -163,6 +218,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     : Colors.teal.shade900,
               ),
               onSelected: (_) {
+                onTap('province');
                 ref.read(selectedProvinceProvider.notifier).state = province;
               },
             );
@@ -172,7 +228,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
-  Widget _buildPlacesList(List<PlaceModel> places) {
+  Widget _buildPlacesList(List<PlaceCartModel> places) {
     if (places.isEmpty) {
       return Center(
         child: Text(
@@ -194,19 +250,19 @@ class _HomePageState extends ConsumerState<HomePage> {
           type: 1,
           place: place,
           isFavorite: isFavorite,
-          onTap: () {
+          onTap: () async {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => PlacePage(place: place)),
+              MaterialPageRoute(builder: (_) => PlacePage(id: place.id!)),
             );
           },
           onfav: () {
-            ref.read(favoritesProvider.notifier).toggleFavorite(place);
-            final msg = isFavorite
-                ? 'تمت إزالة المكان من المفضلة'
-                : 'تمت إضافة المكان إلى المفضلة';
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(msg)));
+            // ref.read(favoritesProvider.notifier).toggleFavorite(place);
+            // final msg = isFavorite
+            //     ? 'تمت إزالة المكان من المفضلة'
+            //     : 'تمت إضافة المكان إلى المفضلة';
+            // ScaffoldMessenger.of(context)
+            //     .showSnackBar(SnackBar(content: Text(msg)));
           },
         );
       },
