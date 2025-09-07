@@ -29,7 +29,11 @@ class FilterSearchBar extends ConsumerWidget {
                     ),
                   ),
                   builder: (_) => FilterBottomSheet(
-                    onFilter: (p0, p1, p2, p3) {},
+                    cheapest: false,
+                    location: false,
+                    offers: false,
+                    rating: false,
+                    onFilter: (p0, p1, p2, p3,s,ss) {},
                   ),
                 );
               },

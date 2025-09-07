@@ -30,10 +30,23 @@ class _HomePageState extends ConsumerState<HomePage> {
   late Future<List<PlaceCartModel>?> getFavoriteMethod;
   late Future<List<SalesPlacesModel>?> getSalesMethod;
   late Future<List<TripModel>?> getTripMethod;
+  String selectedPlace = 'الكل';
+  bool location = false;
+  bool cheapest = false;
+  bool rating = false;
+  bool offers = false;
+  String? longitude;
+  String? latitude;
 
   @override
   void initState() {
-    getPlacesMethod = getPlacesWithFilter(context: context, cityFilter: '');
+    getPlacesMethod = getPlacesWithFilter(
+        context: context,
+        filter: getFilterText(
+            cheapest: cheapest,
+            rating: rating,
+            offers: offers,
+            cityName: selectedPlace));
     getFavoriteMethod = getFavorites(context: context);
     getSalesMethod = getSales(context: context);
     getTripMethod = getTrips(context: context);
@@ -90,8 +103,13 @@ class _HomePageState extends ConsumerState<HomePage> {
               height: 600,
               child: IconButton(
                   onPressed: () {
-                    getPlacesMethod =
-                        getPlacesWithFilter(context: context, cityFilter: '');
+                    getPlacesMethod = getPlacesWithFilter(
+                        context: context,
+                        filter: getFilterText(
+                            cheapest: cheapest,
+                            rating: rating,
+                            offers: offers,
+                            cityName: selectedPlace));
                     setState(() {});
                   },
                   icon: const Icon(Icons.replay_outlined)),
@@ -187,7 +205,30 @@ class _HomePageState extends ConsumerState<HomePage> {
                             BorderRadius.vertical(top: Radius.circular(24)),
                       ),
                       builder: (_) => FilterBottomSheet(
-                        onFilter: (p0, p1, p2, p3) {},
+                        cheapest: cheapest,
+                        location: location,
+                        offers: offers,
+                        rating: rating,
+                        onFilter: (c, r, o, l, long, lat) async {
+                          cheapest = c;
+                          rating = r;
+                          offers = o;
+                          location = l;
+                          longitude = long;
+                          latitude = lat;
+                          if (context.mounted) {
+                            getPlacesMethod = getPlacesWithFilter(
+                                context: context,
+                                filter: getFilterText(
+                                    cheapest: cheapest,
+                                    rating: rating,
+                                    offers: offers,
+                                    cityName: selectedPlace,
+                                    latitude: latitude,
+                                    longitude: longitude));
+                            setState(() {});
+                          }
+                        },
                       ),
                     );
                     // بعد الإغلاق: الفلترة تتحدث تلقائياً
@@ -212,7 +253,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               switch (index) {
                 case 0:
                   getPlacesMethod =
-                      getPlacesWithFilter(context: context, cityFilter: '');
+                      getPlacesWithFilter(context: context, filter: '');
                   break;
                 case 1:
                   getFavoriteMethod = getFavorites(context: context);
@@ -238,7 +279,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             const SizedBox(height: 12),
             _buildProvinceFilter(context, (String text) {
               getPlacesMethod =
-                  getPlacesWithFilter(context: context, cityFilter: text);
+                  getPlacesWithFilter(context: context, filter: text);
               setState(() {});
             }),
             pages[_pageIndex]
@@ -273,7 +314,11 @@ class _HomePageState extends ConsumerState<HomePage> {
                       : Colors.teal.shade900,
                 ),
                 onSelected: (_) {
-                  onTap('');
+                  onTap(getFilterText(
+                      cheapest: cheapest,
+                      rating: rating,
+                      offers: offers,
+                      cityName: selectedPlace));
                   ref.read(selectedProvinceProvider.notifier).state = null;
                 },
               );
@@ -302,10 +347,13 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   Widget _buildPlacesList(List<PlaceCartModel> places) {
     if (places.isEmpty) {
-      return Center(
-        child: Text(
-          'لا توجد أماكن مطابقة للفلترة',
-          style: TextStyle(fontSize: 18, color: Colors.grey.shade600),
+      return SizedBox(
+        height: 600,
+        child: Center(
+          child: Text(
+            'لا توجد أماكن مطابقة للفلترة',
+            style: TextStyle(fontSize: 18, color: Colors.grey.shade600),
+          ),
         ),
       );
     }

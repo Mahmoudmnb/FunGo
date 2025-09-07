@@ -1,8 +1,9 @@
 // lib/features/home/widgets/filter_widget.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:location/location.dart';
 
-import '../providers/home_providers.dart';
+import '../../methods/place_methods.dart';
 
 class FilterIconButton extends StatelessWidget {
   const FilterIconButton({super.key, this.onPressed});
@@ -25,30 +26,40 @@ class FilterIconButton extends StatelessWidget {
   }
 }
 
+// ignore: must_be_immutable
 class FilterBottomSheet extends ConsumerWidget {
-  final Function(bool, bool, bool, bool) onFilter;
-  const FilterBottomSheet({
+  bool location;
+  bool cheapest;
+  bool rating;
+  bool offers;
+  bool isLoading = false;
+  Function(bool, bool, bool, bool, String?, String?) onFilter;
+  FilterBottomSheet({
     super.key,
     required this.onFilter,
+    required this.cheapest,
+    required this.location,
+    required this.offers,
+    required this.rating,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final rating = ref.watch(selectedRatingProvider);
-    final budget = ref.watch(selectedBudgetProvider);
-    final location = ref.watch(selectedLocationProvider);
-    final selectedActivity = ref.watch(selectedActivityProvider);
-    final all = ref.watch(placesProvider);
+    // final rating = ref.watch(selectedRatingProvider);
+    // final budget = ref.watch(selectedBudgetProvider);
+    // final location = ref.watch(selectedLocationProvider);
+    // final selectedActivity = ref.watch(selectedActivityProvider);
+    // final all = ref.watch(placesProvider);
 
     // جمع أسماء الانشطة المتاحة لاستخدامها في chips
-    final activities = <String>{};
+    // final activities = <String>{};
     // for (final p in all) {
     //   for (final a in p.activities) {
     //     final name = (a['name'] ?? '').toString().trim();
     //     if (name.isNotEmpty) activities.add(name);
     //   }
     // }
-    final activityList = activities.toList();
+    // final activityList = activities.toList();
 
     return SafeArea(
       top: false,
@@ -136,72 +147,90 @@ class FilterBottomSheet extends ConsumerWidget {
               // const SizedBox(height: 12),
 
               // Location switch (كما كان)
-// https://fungo.mustafafares.com/api/places/index?filters[]=nearest&activity_type_id=1&governorate=aleppo&longitude=36.8&latitude=25.6
-// ?filters[]=cheapest&filters[]=offers&filters[]=rating&filters[]=nearest&activity_type_id=1&governorate=aleppo
-              Row(
-                children: [
-                  SizedBox(
-                      width: 300,
-                      child: Text('فلترة حسب الأرخص',
-                          style: Theme.of(context).textTheme.titleMedium)),
-                  Expanded(
-                    child: Switch(
-                      value: location ?? false,
-                      activeColor: Colors.teal.shade700,
-                      onChanged: (v) =>
-                          ref.read(selectedLocationProvider.notifier).state = v,
+              StatefulBuilder(
+                builder: (context, setState) => Row(
+                  children: [
+                    SizedBox(
+                        width: 300,
+                        child: Text('فلترة حسب الأرخص',
+                            style: Theme.of(context).textTheme.titleMedium)),
+                    Expanded(
+                      child: Switch(
+                        value: cheapest,
+                        activeColor: Colors.teal.shade700,
+                        onChanged: (v) {
+                          // ref.read(selectedLocationProvider.notifier).state = v;
+                          cheapest = !cheapest;
+                          setState(() {});
+                        },
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-              Row(
-                children: [
-                  SizedBox(
-                      width: 300,
-                      child: Text('فلترة حسب التقييم',
-                          style: Theme.of(context).textTheme.titleMedium)),
-                  Expanded(
-                    child: Switch(
-                      value: location ?? false,
-                      activeColor: Colors.teal.shade700,
-                      onChanged: (v) =>
-                          ref.read(selectedLocationProvider.notifier).state = v,
+              StatefulBuilder(
+                builder: (context, setState) => Row(
+                  children: [
+                    SizedBox(
+                        width: 300,
+                        child: Text('فلترة حسب التقييم',
+                            style: Theme.of(context).textTheme.titleMedium)),
+                    Expanded(
+                      child: Switch(
+                        value: rating,
+                        activeColor: Colors.teal.shade700,
+                        onChanged: (v) {
+                          // ref.read(selectedLocationProvider.notifier).state = v;
+                          rating = !rating;
+                          setState(() {});
+                        },
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-              Row(
-                children: [
-                  SizedBox(
-                      width: 300,
-                      child: Text('إظهار فقط الاماكن التي تحوي حسومات',
-                          style: Theme.of(context).textTheme.titleMedium)),
-                  Expanded(
-                    child: Switch(
-                      value: location ?? false,
-                      activeColor: Colors.teal.shade700,
-                      onChanged: (v) =>
-                          ref.read(selectedLocationProvider.notifier).state = v,
+              StatefulBuilder(
+                builder: (context, setState) => Row(
+                  children: [
+                    SizedBox(
+                        width: 300,
+                        child: Text('إظهار فقط الاماكن التي تحوي حسومات',
+                            style: Theme.of(context).textTheme.titleMedium)),
+                    Expanded(
+                      child: Switch(
+                        value: offers,
+                        activeColor: Colors.teal.shade700,
+                        onChanged: (v) {
+                          // ref.read(selectedLocationProvider.notifier).state = v;
+                          offers = !offers;
+                          setState(() {});
+                        },
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
 
-              Row(
-                children: [
-                  SizedBox(
-                      width: 300,
-                      child: Text('الأقرب الي',
-                          style: Theme.of(context).textTheme.titleMedium)),
-                  Expanded(
-                    child: Switch(
-                      value: location ?? false,
-                      activeColor: Colors.teal.shade700,
-                      onChanged: (v) =>
-                          ref.read(selectedLocationProvider.notifier).state = v,
+              StatefulBuilder(
+                builder: (context, setState) => Row(
+                  children: [
+                    SizedBox(
+                        width: 300,
+                        child: Text('الأقرب الي',
+                            style: Theme.of(context).textTheme.titleMedium)),
+                    Expanded(
+                      child: Switch(
+                        value: location,
+                        activeColor: Colors.teal.shade700,
+                        onChanged: (v) {
+                          // ref.read(selectedLocationProvider.notifier).state = v;
+                          location = !location;
+                          setState(() {});
+                        },
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
 
               const SizedBox(height: 12),
@@ -250,18 +279,48 @@ class FilterBottomSheet extends ConsumerWidget {
               //   const SizedBox(height: 12),
               // ],
 
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Colors.teal.shade700,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14)),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+              StatefulBuilder(
+                builder: (context, setState) => SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Colors.teal.shade700,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14)),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    onPressed: () async {
+                      String? longitude;
+                      String? latitude;
+                      LocationData? currentLocation;
+                      if (location) {
+                        isLoading = true;
+                        setState(() {});
+                        currentLocation = await getLocation();
+                        if (currentLocation != null) {
+                          longitude = currentLocation.longitude.toString();
+                          latitude = currentLocation.latitude.toString();
+                        }
+                        isLoading = false;
+                        setState(() {});
+                      }
+                      await onFilter(cheapest, rating, offers, location,
+                          longitude, latitude);
+                      if (context.mounted) {
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ))
+                        : const Text('تطبيق',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('تطبيق',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
               ),
 
@@ -271,14 +330,16 @@ class FilterBottomSheet extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: OutlinedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         // إعادة التعيين
-                        ref.read(selectedRatingProvider.notifier).state = null;
-                        ref.read(selectedBudgetProvider.notifier).state = null;
-                        ref.read(selectedLocationProvider.notifier).state =
-                            null;
-                        ref.read(selectedActivityProvider.notifier).state =
-                            null;
+                        // ref.read(selectedRatingProvider.notifier).state = null;
+                        // ref.read(selectedBudgetProvider.notifier).state = null;
+                        // ref.read(selectedLocationProvider.notifier).state =
+                        //     null;
+                        // ref.read(selectedActivityProvider.notifier).state =
+                        //     null;
+
+                        onFilter(false, false, false, false, null, null);
                         Navigator.pop(context);
                       },
                       child: const Text('مسح الفلاتر'),

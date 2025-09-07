@@ -459,7 +459,7 @@ class _TripPageState extends State<TripPage> {
                             s(() {});
                             List<PlaceCartModel>? places =
                                 await getPlacesWithFilter(
-                                    context: context, cityFilter: '');
+                                    context: context, filter: '');
                             isLoading = false;
                             s(() {});
                             if (places != null) {

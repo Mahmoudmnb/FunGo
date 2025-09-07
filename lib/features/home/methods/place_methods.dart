@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:location/location.dart';
 import 'package:toast/toast.dart';
 
 import '../../../core/constants.dart';
@@ -12,13 +13,13 @@ import '../../places/models/place_model.dart';
 
 Future<List<PlaceCartModel>?> getPlacesWithFilter({
   required BuildContext context,
-  required String cityFilter,
+  required String filter,
 }) async {
   List<PlaceCartModel>? data;
   await checkInternet(() async {
     ToastContext().init(context);
     http.Response res = await http.get(
-      Uri.parse('${Constants.filterPlaces}?governorate=$cityFilter'),
+      Uri.parse('${Constants.filterPlaces}$filter'),
       headers: {
         'Accept': 'application/json',
         'Authorization': 'Bearer ${Constants.user!.token}',
@@ -53,8 +54,6 @@ Future<List<PlaceCartModel>?> getPlacesWithFilter({
   }, context);
   return data;
 }
-
-// ?filters[]=cheapest&filters[]=offers&filters[]=rating&filters[]=nearest&activity_type_id=1&governorate=aleppo
 
 Future<PlaceModel?> getPlace({
   required BuildContext context,
@@ -188,4 +187,54 @@ Future<Stories?> uploadStory(
     }
   }, context);
   return stories;
+}
+
+String getFilterText({
+  required bool cheapest,
+  required bool rating,
+  required bool offers,
+  required String cityName,
+  String? longitude,
+  String? latitude,
+}) {
+  String filter = '?';
+  if (cheapest) {
+    // filter += 'filters[]=cheapest';
+  }
+  if (rating) {
+    filter += '&filters[]=rating';
+  }
+  if (offers) {
+    filter += '&filters[]=offers';
+  }
+  if (cityName != 'الكل') {
+    filter += '&governorate=$cityName';
+  }
+  if (longitude != null && latitude != null) {
+    filter += '&filters[]=nearest&longitude=$longitude&latitude=$latitude';
+  }
+  if (filter.length == 1) {
+    filter = '';
+  }
+  return filter;
+}
+
+Future<LocationData?> getLocation() async {
+  Location location = Location();
+  bool serviceEnabled;
+  PermissionStatus permissionGranted;
+
+  serviceEnabled = await location.serviceEnabled();
+  if (!serviceEnabled) {
+    serviceEnabled = await location.requestService();
+    if (!serviceEnabled) return null;
+  }
+
+  permissionGranted = await location.hasPermission();
+  if (permissionGranted == PermissionStatus.denied) {
+    permissionGranted = await location.requestPermission();
+    if (permissionGranted != PermissionStatus.granted) return null;
+  }
+
+  return location.getLocation();
 }
