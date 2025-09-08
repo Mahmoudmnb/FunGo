@@ -29,23 +29,19 @@ Future<bool> login(
       },
       body: {'email': email, 'password': password},
     );
-
     if (res.statusCode == 201) {
+      User user = User.fromMap(jsonDecode(res.body)['data']);
       String? token = await getToken();
-      var headers = {
-        'Accept': 'application/json',
-        'Authorization': 'Bearer ${Constants.user!.token}'
-      };
-      var request = http.MultipartRequest(
-          'POST', Uri.parse('https://fungo.mustafafares.com/api/device-token'));
-      request.fields.addAll({'token': token ?? ''});
-
-      request.headers.addAll(headers);
-
-      http.StreamedResponse response = await request.send();
-
+      http.Response response = await http.post(
+          Uri.parse('https://fungo.mustafafares.com/api/device-token'),
+          headers: {
+            'Accept': 'application/json',
+            'Authorization': 'Bearer ${user.token}'
+          },
+          body: {
+            'token': token ?? ''
+          });
       if (response.statusCode == 200) {
-        User user = User.fromMap(jsonDecode(res.body)['data']);
         Constants.user = user;
         SharedPreferences sh = await SharedPreferences.getInstance();
         sh.setString('user', jsonEncode(user.toMap()));
@@ -83,21 +79,18 @@ Future<bool> register(
       },
     );
     if (res.statusCode == 201) {
+      User user = User.fromMap(jsonDecode(res.body)['data']);
       String? token = await getToken();
-      var headers = {
-        'Accept': 'application/json',
-        'Authorization': 'Bearer ${Constants.user!.token}'
-      };
-      var request = http.MultipartRequest(
-          'POST', Uri.parse('https://fungo.mustafafares.com/api/device-token'));
-      request.fields.addAll({'token': token ?? ''});
-
-      request.headers.addAll(headers);
-
-      http.StreamedResponse response = await request.send();
-
+      http.Response response = await http.post(
+          Uri.parse('https://fungo.mustafafares.com/api/device-token'),
+          headers: {
+            'Accept': 'application/json',
+            'Authorization': 'Bearer ${user.token}'
+          },
+          body: {
+            'token': token ?? ''
+          });
       if (response.statusCode == 200) {
-        User user = User.fromMap(jsonDecode(res.body)['data']);
         Constants.user = user;
         SharedPreferences sh = await SharedPreferences.getInstance();
         sh.setString('user', jsonEncode(user.toMap()));

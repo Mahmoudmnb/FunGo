@@ -1,20 +1,27 @@
 // lib/main.dart
+import 'dart:developer';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fun_go_app/firebase_options.dart';
 
 import 'core/providers/auth_provider.dart';
 import 'features/auth/presentation/pages/login_page.dart';
 import 'features/auth/presentation/pages/splash_page.dart';
 import 'features/home/presentation/pages/home_page.dart';
+import 'firebase_options.dart';
 import 'injection.dart';
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 // Handle background messages
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  print("Background message: ${message.messageId}");
+  log("Background message: ${message.notification!.title}");
 }
 
 void requestPermission() async {
@@ -26,16 +33,42 @@ void requestPermission() async {
     sound: true,
   );
 
-  print("Permission: ${settings.authorizationStatus}");
+  log("Permission: ${settings.authorizationStatus}");
 }
 
 void initNotifications() {
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    print("Message received in foreground: ${message.notification?.title}");
+    flutterLocalNotificationsPlugin.show(
+      message.notification.hashCode,
+      message.notification?.title,
+      message.notification?.body,
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'channelId',
+          'channelName',
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+      ),
+    );
+    log("Message received in foreground: ${message.notification?.title}");
   });
 
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-    print("User tapped notification: ${message.notification?.title}");
+    flutterLocalNotificationsPlugin.show(
+      message.notification.hashCode,
+      message.notification?.title,
+      message.notification?.body,
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'channelId',
+          'channelName',
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+      ),
+    );
+    log("User tapped notification: ${message.notification?.title}");
   });
 }
 
@@ -45,8 +78,30 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
 
+  const DarwinInitializationSettings initializationSettingsDarwin =
+      DarwinInitializationSettings(
+    requestSoundPermission: true,
+    requestBadgePermission: true,
+    requestAlertPermission: true,
+  );
+
+  const InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+    iOS: initializationSettingsDarwin,
+  );
+
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  requestPermission();
+  initNotifications();
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   runApp(const ProviderScope(child: FungoApp()));
 }
 

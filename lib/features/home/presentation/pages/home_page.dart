@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants.dart';
 import '../../../../shared/widgets/place_card.dart';
-import '../../../auth/methods/auth_methods.dart';
 import '../../../favorites/methods/favorite_method.dart';
 import '../../../favorites/presentation/pages/favorites_page.dart';
 import '../../../offers/presentation/pages/offers_page.dart';
@@ -197,42 +196,41 @@ class _HomePageState extends ConsumerState<HomePage> {
               ? Padding(
                   padding: const EdgeInsets.only(right: 12),
                   child: FilterIconButton(onPressed: () async {
-                    getToken();
-                    // await showModalBottomSheet(
-                    //   context: context,
-                    //   isScrollControlled: true,
-                    //   useSafeArea: true,
-                    //   shape: const RoundedRectangleBorder(
-                    //     borderRadius:
-                    //         BorderRadius.vertical(top: Radius.circular(24)),
-                    //   ),
-                    //   builder: (_) => FilterBottomSheet(
-                    //     cheapest: cheapest,
-                    //     location: location,
-                    //     offers: offers,
-                    //     rating: rating,
-                    //     onFilter: (c, r, o, l, long, lat) async {
-                    //       cheapest = c;
-                    //       rating = r;
-                    //       offers = o;
-                    //       location = l;
-                    //       longitude = long;
-                    //       latitude = lat;
-                    //       if (context.mounted) {
-                    //         getPlacesMethod = getPlacesWithFilter(
-                    //             context: context,
-                    //             filter: getFilterText(
-                    //                 cheapest: cheapest,
-                    //                 rating: rating,
-                    //                 offers: offers,
-                    //                 cityName: selectedPlace,
-                    //                 latitude: latitude,
-                    //                 longitude: longitude));
-                    //         setState(() {});
-                    //       }
-                    //     },
-                    //   ),
-                    // );
+                    await showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      useSafeArea: true,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(24)),
+                      ),
+                      builder: (_) => FilterBottomSheet(
+                        cheapest: cheapest,
+                        location: location,
+                        offers: offers,
+                        rating: rating,
+                        onFilter: (c, r, o, l, long, lat) async {
+                          cheapest = c;
+                          rating = r;
+                          offers = o;
+                          location = l;
+                          longitude = long;
+                          latitude = lat;
+                          if (context.mounted) {
+                            getPlacesMethod = getPlacesWithFilter(
+                                context: context,
+                                filter: getFilterText(
+                                    cheapest: cheapest,
+                                    rating: rating,
+                                    offers: offers,
+                                    cityName: selectedPlace,
+                                    latitude: latitude,
+                                    longitude: longitude));
+                            setState(() {});
+                          }
+                        },
+                      ),
+                    );
                     // بعد الإغلاق: الفلترة تتحدث تلقائياً
                   }),
                 )
@@ -368,7 +366,10 @@ class _HomePageState extends ConsumerState<HomePage> {
 
     return StatefulBuilder(
       builder: (context, setState) => SizedBox(
-        height: 620,
+        height: MediaQuery.of(context).size.height -
+            (MediaQuery.of(context).padding.bottom +
+                MediaQuery.of(context).padding.top) -
+            228,
         width: MediaQuery.sizeOf(context).width,
         child: ListView.builder(
           padding: const EdgeInsets.symmetric(vertical: 12),
